@@ -1,0 +1,1932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>K7 SOC Playbook v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; font-family: 'Inter', sans-serif; background: #f5f6f8; color: #1a1d23; }
+
+/* ── LOGIN ── */
+#loginScreen {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  background: #f5f6f8;
+}
+.login-box {
+  background: #fff;
+  border: 1px solid #e4e7ed;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  width: 100%; max-width: 360px;
+  text-align: center;
+}
+.login-shield {
+  width: 56px; height: 56px;
+  background: #dc2626;
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.25rem;
+  font-size: 26px; color: #fff;
+}
+.login-box h1 { font-size: 20px; font-weight: 600; margin-bottom: 4px; }
+.login-box p  { font-size: 13px; color: #6b7280; margin-bottom: 1.75rem; }
+.login-box input {
+  width: 100%; padding: 11px 14px;
+  border: 1px solid #e4e7ed; border-radius: 10px;
+  font-size: 14px; font-family: 'Inter', sans-serif;
+  margin-bottom: 10px; outline: none;
+  transition: border-color 0.2s;
+}
+.login-box input:focus { border-color: #dc2626; }
+.login-box button {
+  width: 100%; padding: 12px;
+  background: #dc2626; color: #fff;
+  border: none; border-radius: 10px;
+  font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: background 0.2s;
+}
+.login-box button:hover { background: #b91c1c; }
+.login-err { margin-top: 10px; font-size: 13px; color: #dc2626; display: none; }
+.login-note { margin-top: 1.5rem; font-size: 11px; color: #9ca3af; }
+
+/* ── APP ── */
+#appScreen { display: none; min-height: 100vh; }
+
+/* ── HOME ── */
+#homeView {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 2rem;
+}
+.home-logo {
+  width: 52px; height: 52px;
+  background: #dc2626; border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; color: #fff;
+  margin-bottom: 1rem;
+}
+.home-title { font-size: 26px; font-weight: 600; margin-bottom: 6px; text-align: center; }
+.home-sub   { font-size: 15px; color: #6b7280; margin-bottom: 2.5rem; text-align: center; }
+
+/* Category filter tabs */
+.filter-tabs { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 1.5rem; }
+.filter-tab {
+  padding: 6px 14px; border-radius: 99px; font-size: 12px; font-weight: 500;
+  background: #f3f4f6; border: 1px solid #e4e7ed; cursor: pointer;
+  transition: all 0.15s; color: #6b7280;
+}
+.filter-tab:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+.filter-tab.active { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+.search-box-wrap { position: relative; width: 100%; max-width: 560px; }
+.big-search {
+  width: 100%;
+  padding: 16px 20px 16px 52px;
+  font-size: 17px; font-family: 'Inter', sans-serif;
+  border: 2px solid #e4e7ed;
+  border-radius: 14px;
+  outline: none;
+  background: #fff;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.big-search:focus { border-color: #dc2626; box-shadow: 0 2px 24px rgba(220,38,38,0.1); }
+.big-search::placeholder { color: #9ca3af; }
+.search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); font-size: 20px; color: #9ca3af; pointer-events: none; }
+.search-results-drop {
+  display: none;
+  position: absolute; top: calc(100% + 8px); left: 0; right: 0;
+  background: #fff; border: 1px solid #e4e7ed; border-radius: 12px;
+  overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.1); z-index: 100;
+  max-height: 360px; overflow-y: auto;
+}
+.srd-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; cursor: pointer; border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+.srd-item:last-child { border-bottom: none; }
+.srd-item:hover { background: #fef2f2; }
+.srd-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; font-size: 16px; flex-shrink: 0; }
+.srd-name  { font-size: 15px; font-weight: 500; }
+.srd-steps { font-size: 12px; color: #6b7280; margin-top: 1px; }
+.srd-sev   { margin-left: auto; font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 99px; flex-shrink: 0; }
+
+.all-cards {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 10px; width: 100%; max-width: 900px; margin-top: 0;
+}
+.alert-card {
+  background: #fff; border: 1px solid #e4e7ed; border-radius: 12px;
+  padding: 1rem 1.25rem; cursor: pointer;
+  display: flex; align-items: center; gap: 12px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.alert-card:hover { border-color: #dc2626; box-shadow: 0 2px 12px rgba(220,38,38,0.08); }
+.alert-card.hidden { display: none; }
+.ac-icon { width: 38px; height: 38px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; flex-shrink: 0; }
+.ac-name  { font-size: 14px; font-weight: 500; }
+.ac-steps { font-size: 12px; color: #6b7280; margin-top: 2px; }
+.ac-sev   { margin-left: auto; font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; flex-shrink: 0; }
+.home-footer { margin-top: 2.5rem; font-size: 12px; color: #9ca3af; text-align: center; }
+
+/* ── SOP VIEW ── */
+#sopView { display: none; min-height: 100vh; background: #f5f6f8; }
+.sop-topbar {
+  background: #fff; border-bottom: 1px solid #e4e7ed;
+  padding: 1rem 1.5rem; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 50;
+}
+.back-btn {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 14px; color: #6b7280; cursor: pointer;
+  background: none; border: none; font-family: 'Inter', sans-serif;
+  padding: 6px 10px; border-radius: 8px; transition: background 0.15s, color 0.15s;
+}
+.back-btn:hover { background: #f3f4f6; color: #1a1d23; }
+.sop-topbar-title { font-size: 15px; font-weight: 600; flex: 1; }
+.sop-topbar-sev   { font-size: 12px; font-weight: 600; padding: 4px 12px; border-radius: 99px; }
+.progress-wrap { display: flex; align-items: center; gap: 8px; }
+.progress-bar-bg { width: 80px; height: 6px; background: #e4e7ed; border-radius: 99px; overflow: hidden; }
+.progress-bar-fill { height: 100%; background: #16a34a; border-radius: 99px; transition: width 0.3s; }
+.progress-text { font-size: 12px; color: #6b7280; white-space: nowrap; }
+
+.sop-body { max-width: 720px; margin: 0 auto; padding: 1.5rem; }
+
+/* SECTION LABEL */
+.sec-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #9ca3af; margin: 1.5rem 0 0.75rem;
+}
+.sec-label:first-child { margin-top: 0; }
+
+/* DATA POINTS */
+.dp-grid { display: flex; flex-direction: column; gap: 6px; }
+.dp-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  background: #fff; border: 1px solid #e4e7ed; border-radius: 10px; padding: 10px 14px;
+}
+.dp-num { width: 22px; height: 22px; border-radius: 50%; background: #f3f4f6; border: 1px solid #e4e7ed; font-size: 11px; font-weight: 600; color: #6b7280; display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.dp-field  { font-size: 13px; font-weight: 500; width: 160px; flex-shrink: 0; }
+.dp-extract{ font-size: 12px; font-family: monospace; background: #eff6ff; color: #1d4ed8; padding: 2px 8px; border-radius: 5px; margin-right: 8px; white-space: nowrap; }
+.dp-why    { font-size: 13px; color: #6b7280; }
+
+/* STEPS */
+.steps-list { display: flex; flex-direction: column; gap: 0; }
+.step-row { display: flex; align-items: flex-start; gap: 14px; padding: 0 0 0 4px; }
+.step-left { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.step-check {
+  width: 32px; height: 32px; border-radius: 50%;
+  border: 2px solid #e4e7ed; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0; font-size: 14px; font-weight: 700; color: #9ca3af;
+  background: #fff; transition: all 0.2s; user-select: none;
+}
+.step-check:hover { border-color: #dc2626; color: #dc2626; }
+.step-check.done  { background: #16a34a; border-color: #16a34a; color: #fff; }
+.step-connector { width: 2px; flex: 1; min-height: 20px; background: #e4e7ed; margin: 4px 0; }
+.step-connector.done { background: #16a34a; }
+.step-content {
+  flex: 1; background: #fff; border: 1px solid #e4e7ed; border-radius: 12px;
+  padding: 14px 16px; margin-bottom: 12px; transition: border-color 0.2s, opacity 0.2s;
+}
+.step-content.done { opacity: 0.55; }
+.step-content.active-step { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.06); }
+.step-num-label { font-size: 10px; font-weight: 600; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.step-action { font-size: 15px; font-weight: 500; margin-bottom: 10px; }
+.step-meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.meta-chip { display: flex; align-items: center; gap: 5px; font-size: 12px; padding: 4px 10px; border-radius: 8px; font-weight: 500; }
+.chip-tool    { background: #eff6ff; color: #1d4ed8; }
+.chip-outcome { background: #f0fdf4; color: #15803d; }
+.chip-warn    { background: #fffbeb; color: #92400e; }
+.chip-danger  { background: #fef2f2; color: #991b1b; }
+.chip-decision{ background: #faf5ff; color: #6b21a8; }
+.step-type-badge { font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; letter-spacing: 0.4px; margin-left: auto; }
+.badge-action   { background: #eff6ff; color: #1d4ed8; }
+.badge-decision { background: #faf5ff; color: #6b21a8; }
+.badge-escalate { background: #fef2f2; color: #991b1b; }
+.badge-close    { background: #f0fdf4; color: #15803d; }
+
+/* Quick Decision Table */
+.qd-table { width: 100%; border-collapse: collapse; }
+.qd-table th { background: #f3f4f6; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; padding: 8px 12px; text-align: left; border: 1px solid #e4e7ed; }
+.qd-table td { font-size: 13px; padding: 9px 12px; border: 1px solid #e4e7ed; vertical-align: top; background: #fff; }
+.qd-table tr:hover td { background: #fef2f2; }
+.td-close   { color: #16a34a; font-weight: 500; }
+.td-esc     { color: #dc2626; font-weight: 500; }
+.td-inv     { color: #d97706; font-weight: 500; }
+
+/* TOOLS */
+.tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap: 8px; }
+.tool-tile { background: #fff; border: 1px solid #e4e7ed; border-radius: 10px; padding: 12px 14px; }
+.tool-cat  { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #9ca3af; margin-bottom: 4px; }
+.tool-name { font-size: 14px; font-weight: 500; }
+.tool-desc { font-size: 12px; color: #6b7280; margin-top: 2px; }
+
+/* ESCALATION */
+.esc-list { display: flex; flex-direction: column; gap: 8px; }
+.esc-row { display: flex; align-items: center; gap: 12px; background: #fff; border: 1px solid #e4e7ed; border-left: 4px solid #dc2626; border-radius: 10px; padding: 12px 14px; }
+.esc-trigger { font-size: 14px; font-weight: 500; flex: 1; }
+.esc-action  { font-size: 13px; color: #dc2626; font-weight: 500; }
+
+/* EDGE CASES */
+.edge-list { display: flex; flex-direction: column; gap: 6px; }
+.edge-row { display: flex; align-items: flex-start; gap: 10px; background: #fff; border: 1px solid #e4e7ed; border-radius: 10px; padding: 12px 14px; font-size: 13px; }
+.edge-row.edge-ok     { border-left: 4px solid #16a34a; }
+.edge-row.edge-warn   { border-left: 4px solid #d97706; }
+.edge-row.edge-danger { border-left: 4px solid #dc2626; }
+
+/* RESET BTN */
+.reset-btn { display: flex; align-items: center; gap: 6px; background: #f3f4f6; border: 1px solid #e4e7ed; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #6b7280; cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s; }
+.reset-btn:hover { background: #e5e7eb; }
+.sop-actions { display: flex; gap: 10px; align-items: center; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #e4e7ed; }
+
+/* SEVERITY COLORS */
+.sev-critical { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+.sev-high     { background: #fffbeb; color: #92400e; border: 1px solid #fde68a; }
+.sev-medium   { background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; }
+.sev-low      { background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; }
+.icon-critical { background: #fef2f2; color: #dc2626; }
+.icon-high     { background: #fffbeb; color: #d97706; }
+.icon-medium   { background: #eff6ff; color: #2563eb; }
+.icon-low      { background: #f0fdf4; color: #16a34a; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 99px; }
+
+/* ── GUIDELINES VIEW ── */
+#guideView { display: none; min-height: 100vh; background: #f5f6f8; }
+.guide-topbar {
+  background: #fff; border-bottom: 1px solid #e4e7ed;
+  padding: 1rem 1.5rem; display: flex; align-items: center; gap: 12px;
+  position: sticky; top: 0; z-index: 50;
+}
+.guide-body { max-width: 820px; margin: 0 auto; padding: 1.5rem; }
+
+/* guide tab bar */
+.guide-tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.guide-tab {
+  padding: 7px 16px; border-radius: 99px; font-size: 13px; font-weight: 500;
+  background: #f3f4f6; border: 1px solid #e4e7ed; cursor: pointer;
+  transition: all 0.15s; color: #6b7280;
+}
+.guide-tab:hover  { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+.guide-tab.active { background: #dc2626; color: #fff; border-color: #dc2626; }
+
+.guide-panel { display: none; }
+.guide-panel.active { display: block; }
+
+/* role cards */
+.role-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px,1fr)); gap: 12px; margin-bottom: 1.5rem; }
+.role-card {
+  background: #fff; border: 1px solid #e4e7ed; border-radius: 14px;
+  padding: 1.25rem; text-align: center;
+}
+.role-badge {
+  display: inline-block; padding: 4px 14px; border-radius: 99px;
+  font-size: 12px; font-weight: 700; margin-bottom: 10px;
+}
+.role-l1 { background: #eff6ff; color: #1d4ed8; }
+.role-l2 { background: #faf5ff; color: #6b21a8; }
+.role-l3 { background: #fef2f2; color: #991b1b; }
+.role-card h3 { font-size: 15px; font-weight: 600; margin-bottom: 6px; }
+.role-card p  { font-size: 13px; color: #6b7280; line-height: 1.5; }
+.role-focus { margin-top: 10px; font-size: 12px; font-weight: 600; color: #374151; }
+
+/* guide step table */
+.guide-table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; }
+.guide-table th {
+  background: #1a1d23; color: #fff;
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 10px 14px; text-align: left;
+}
+.guide-table th:first-child { border-radius: 8px 0 0 0; }
+.guide-table th:last-child  { border-radius: 0 8px 0 0; }
+.guide-table td { font-size: 13px; padding: 10px 14px; border-bottom: 1px solid #f3f4f6; background: #fff; vertical-align: top; }
+.guide-table tr:hover td { background: #fafafa; }
+.guide-table td:first-child { font-weight: 600; color: #dc2626; width: 40px; text-align: center; }
+
+/* phase header inside guide table */
+.phase-row td {
+  background: #f8fafc !important;
+  font-weight: 700 !important; font-size: 12px !important;
+  color: #374151 !important; text-transform: uppercase;
+  letter-spacing: 0.5px; padding: 8px 14px !important;
+  border-top: 2px solid #e4e7ed;
+}
+
+/* alert summary stats */
+.stat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px,1fr)); gap: 10px; margin-bottom: 1.5rem; }
+.stat-card {
+  background: #fff; border: 1px solid #e4e7ed; border-radius: 12px;
+  padding: 1rem 1.25rem; display: flex; align-items: center; gap: 12px;
+}
+.stat-num  { font-size: 24px; font-weight: 700; color: #dc2626; }
+.stat-label{ font-size: 13px; color: #6b7280; margin-top: 2px; }
+.stat-icon { font-size: 24px; }
+
+.summary-table { width: 100%; border-collapse: collapse; }
+.summary-table th { background: #f3f4f6; font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; padding: 8px 14px; text-align: left; border: 1px solid #e4e7ed; }
+.summary-table td { font-size: 13px; padding: 9px 14px; border: 1px solid #e4e7ed; background: #fff; }
+.summary-table tr:hover td { background: #fef2f2; }
+.summary-table td:last-child { font-weight: 600; color: #1a1d23; text-align: right; }
+.bar-wrap { display: flex; align-items: center; gap: 8px; }
+.bar-bg { flex:1; height: 6px; background: #f3f4f6; border-radius: 99px; overflow: hidden; }
+.bar-fill { height: 100%; background: #dc2626; border-radius: 99px; }
+
+/* guide section label */
+.g-label {
+  font-size: 11px; font-weight: 600; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #9ca3af; margin: 1.5rem 0 0.75rem;
+}
+.g-label:first-child { margin-top: 0; }
+
+/* home guide button */
+.guide-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: #fff; border: 1px solid #e4e7ed; border-radius: 10px;
+  padding: 10px 18px; font-size: 14px; font-weight: 500; color: #374151;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all 0.15s; margin-top: 1.25rem;
+}
+.guide-btn:hover { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-shield">🛡</div>
+    <h1>K7 SOC Team</h1>
+    <p>Security Operations Center · Playbook Portal</p>
+    <input type="text" id="lu" placeholder="Username" />
+    <input type="password" id="lp" placeholder="Password" onkeydown="if(event.key==='Enter')login()" />
+    <button onclick="login()">Open Playbook</button>
+    <div class="login-err" id="lerr">Wrong password. Please try again.</div>
+    <div class="login-note">Internal use only · K7 SOC</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen">
+
+  <!-- HOME -->
+  <div id="homeView">
+    <div class="home-logo">🛡</div>
+    <h1 class="home-title">K7 SOC Playbook</h1>
+    <p class="home-sub">Search for an alert type or pick a category below</p>
+
+    <div class="search-box-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="big-search" id="bigSearch" type="text"
+        placeholder="e.g. Ransomware, SSH, Phishing, Brute Force, WinRM…"
+        autocomplete="off" />
+      <div class="search-results-drop" id="searchDrop"></div>
+    </div>
+
+    <div class="filter-tabs" id="filterTabs">
+      <div class="filter-tab active" data-cat="all" onclick="filterCards('all',this)">All</div>
+      <div class="filter-tab" data-cat="network" onclick="filterCards('network',this)">🌐 Network</div>
+      <div class="filter-tab" data-cat="endpoint" onclick="filterCards('endpoint',this)">💻 Endpoint</div>
+      <div class="filter-tab" data-cat="email" onclick="filterCards('email',this)">📧 Email</div>
+      <div class="filter-tab" data-cat="auth" onclick="filterCards('auth',this)">🔑 Auth</div>
+      <div class="filter-tab" data-cat="malware" onclick="filterCards('malware',this)">🦠 Malware</div>
+    </div>
+
+    <div class="all-cards" id="allCards"></div>
+
+    <button class="guide-btn" onclick="openGuide()">📚 SOC Guidelines &amp; Analyst Handbook →</button>
+    <div class="home-footer">K7 Security Operations Center · Internal Use Only · v3.0</div>
+  </div>
+
+  <!-- GUIDELINES VIEW -->
+  <div id="guideView">
+    <div class="guide-topbar">
+      <button class="back-btn" onclick="goHome()">← Back</button>
+      <div class="sop-topbar-title">SOC Guidelines &amp; Analyst Handbook</div>
+      <span class="sop-topbar-sev sev-medium">REFERENCE</span>
+    </div>
+    <div class="guide-body">
+
+      <!-- Tab bar -->
+      <div class="guide-tabs">
+        <div class="guide-tab active" onclick="switchGuide('overview',this)">🏠 Overview</div>
+        <div class="guide-tab" onclick="switchGuide('analyst',this)">📋 Analyst Guideline</div>
+        <div class="guide-tab" onclick="switchGuide('l1',this)">🔵 L1 Guideline</div>
+        <div class="guide-tab" onclick="switchGuide('l2',this)">🟣 L2 Guideline</div>
+        <div class="guide-tab" onclick="switchGuide('l3',this)">🔴 L3 Guideline</div>
+        <div class="guide-tab" onclick="switchGuide('summary',this)">📊 Alert Summary</div>
+      </div>
+
+      <!-- ── OVERVIEW ── -->
+      <div class="guide-panel active" id="gpanel-overview">
+
+        <div class="g-label">SOC Tier Structure</div>
+        <div class="role-cards">
+          <div class="role-card">
+            <div class="role-badge role-l1">L1 · Triage</div>
+            <h3>Level 1 Analyst</h3>
+            <p>Quick validation using signature, hash, and file path checks.</p>
+            <div class="role-focus">🎯 Goal: Is this alert real or false?</div>
+            <div style="margin-top:8px;font-size:12px;color:#6b7280">Filter false positives · Escalate to L2</div>
+          </div>
+          <div class="role-card">
+            <div class="role-badge role-l2">L2 · Investigation</div>
+            <h3>Level 2 Analyst</h3>
+            <p>Contextual correlation, persistence checks, and deep endpoint analysis.</p>
+            <div class="role-focus">🎯 Goal: Is this behavior legitimate or suspicious?</div>
+            <div style="margin-top:8px;font-size:12px;color:#6b7280">Determine impact · Escalate to L3</div>
+          </div>
+          <div class="role-card">
+            <div class="role-badge role-l3">L3 · Threat Hunter</div>
+            <h3>Level 3 / Senior</h3>
+            <p>Root-cause analysis, reverse engineering, and intelligence correlation.</p>
+            <div class="role-focus">🎯 Goal: What is this threat and how do we defend?</div>
+            <div style="margin-top:8px;font-size:12px;color:#6b7280">Strengthen detection logic · Lead IR</div>
+          </div>
+        </div>
+
+        <div class="g-label">10-Step Universal Analyst Workflow</div>
+        <table class="guide-table">
+          <thead><tr><th>#</th><th>Stage</th><th>What You Do</th><th>Key Question</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Alert Review</td><td>Read alert details carefully in K7 Infinishield</td><td>What is the alert category, source, host, and destination?</td></tr>
+            <tr><td>2</td><td>Validate Alert</td><td>Determine if alert is True Positive or False Positive</td><td>Is the activity normal or suspicious?</td></tr>
+            <tr><td>3</td><td>Gather Context</td><td>Collect logs and relevant events for timeline</td><td>What else happened around this time?</td></tr>
+            <tr><td>4</td><td>Threat Intel Check</td><td>Check IOCs (IPs, hashes, domains) for reputation</td><td>Are any IOCs known malicious or benign?</td></tr>
+            <tr><td>5</td><td>System Inspection</td><td>Inspect system for suspicious processes or persistence</td><td>Is the system showing persistence or abnormal processes?</td></tr>
+            <tr><td>6</td><td>User Investigation</td><td>Check user behavior and actions during alert period</td><td>Was the user tricked or compromised?</td></tr>
+            <tr><td>7</td><td>Correlation</td><td>Correlate with other alerts or incidents</td><td>Are there repeated alerts from this host or user?</td></tr>
+            <tr><td>8</td><td>Decision Making</td><td>Decide on containment or escalation actions</td><td>Is containment needed and what assets are impacted?</td></tr>
+            <tr><td>9</td><td>Documentation</td><td>Document all findings and evidence clearly</td><td>Is documentation clear and evidence linked?</td></tr>
+            <tr><td>10</td><td>Closure &amp; Lessons</td><td>Summarize findings, root cause, and prevention steps</td><td>What caused it and how to prevent recurrence?</td></tr>
+          </tbody>
+        </table>
+
+        <div class="g-label">Tools Used in K7 SOC</div>
+        <div class="tools-grid">
+          <div class="tool-tile"><div class="tool-cat">SIEM</div><div class="tool-name">Cylerian / K7 Infinishield</div><div class="tool-desc">Alert triage, log search, event correlation</div></div>
+          <div class="tool-tile"><div class="tool-cat">EDR/XDR</div><div class="tool-name">K7 InfiniShield</div><div class="tool-desc">Endpoint detection, isolation, process tree</div></div>
+          <div class="tool-tile"><div class="tool-cat">OSINT</div><div class="tool-name">VirusTotal</div><div class="tool-desc">Hash, URL, domain reputation</div></div>
+          <div class="tool-tile"><div class="tool-cat">OSINT</div><div class="tool-name">AbuseIPDB</div><div class="tool-desc">IP reputation and abuse score</div></div>
+          <div class="tool-tile"><div class="tool-cat">OSINT</div><div class="tool-name">Shodan</div><div class="tool-desc">IP/port exposure check</div></div>
+          <div class="tool-tile"><div class="tool-cat">OSINT</div><div class="tool-name">WHOIS / MXToolbox</div><div class="tool-desc">Domain ownership, SPF/DKIM/DMARC</div></div>
+          <div class="tool-tile"><div class="tool-cat">Sandbox</div><div class="tool-name">ANY.RUN</div><div class="tool-desc">Interactive malware sandbox</div></div>
+          <div class="tool-tile"><div class="tool-cat">Sandbox</div><div class="tool-name">Hybrid Analysis</div><div class="tool-desc">Deep file behavior analysis</div></div>
+          <div class="tool-tile"><div class="tool-cat">Firewall</div><div class="tool-name">Jithu (FW Team)</div><div class="tool-desc">IP blocking and firewall rules</div></div>
+          <div class="tool-tile"><div class="tool-cat">OSINT</div><div class="tool-name">URLScan.io</div><div class="tool-desc">URL screenshot and behavior</div></div>
+          <div class="tool-tile"><div class="tool-cat">Analysis</div><div class="tool-name">PEStudio</div><div class="tool-desc">PE file static analysis</div></div>
+          <div class="tool-tile"><div class="tool-cat">Intel</div><div class="tool-name">Wazuh / Sysmon</div><div class="tool-desc">Endpoint log telemetry</div></div>
+        </div>
+      </div>
+
+      <!-- ── ANALYST GUIDELINE ── -->
+      <div class="guide-panel" id="gpanel-analyst">
+        <div class="g-label">Investigation Stages — Full 10-Step Flow</div>
+        <table class="guide-table">
+          <thead><tr><th>#</th><th>Investigation Stage</th><th>Analyst Action</th><th>Tools / Data Sources</th><th>Output / Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Alert Review</td><td>Read alert details carefully in K7 Infinishield</td><td>K7 Infinishield console</td><td>Alert summary</td></tr>
+            <tr><td>2</td><td>Validate Alert</td><td>Determine if alert is True Positive or False Positive</td><td>SOP documentation</td><td>Classification: TP / FP</td></tr>
+            <tr><td>3</td><td>Gather Context</td><td>Collect logs and relevant events for context</td><td>Infinishield: alerts, Events, Process Tree, Event Timeline</td><td>Correlated timeline</td></tr>
+            <tr><td>4</td><td>Threat Intel Check</td><td>Check IOCs for reputation and relevance</td><td>VirusTotal, AbuseIPDB, WHOIS, URLScan</td><td>IOC reputation summary</td></tr>
+            <tr><td>5</td><td>System Inspection</td><td>Inspect system for suspicious processes or persistence</td><td>EDR, Infinishield (Events, Investigation with Shell), Wazuh</td><td>Host behavior summary</td></tr>
+            <tr><td>6</td><td>User Investigation</td><td>Check user behavior and actions during alert period</td><td>User Events</td><td>User activity summary</td></tr>
+            <tr><td>7</td><td>Correlation</td><td>Correlate with other alerts or incidents</td><td>Closed/Investigating Alerts and Incidents</td><td>Related alerts/incidents</td></tr>
+            <tr><td>8</td><td>Decision Making</td><td>Decide on containment or escalation actions</td><td>Containment Sheet, SOP – MDR</td><td>Action plan</td></tr>
+            <tr><td>9</td><td>Documentation</td><td>Document all findings and evidence clearly</td><td>SOC workbook, ticketing system</td><td>Investigation log</td></tr>
+            <tr><td>10</td><td>Closure &amp; Lessons</td><td>Summarize findings, root cause, and prevention steps</td><td>Post-incident review</td><td>Final report</td></tr>
+          </tbody>
+        </table>
+
+        <div class="g-label">Key Questions to Ask on Every Alert</div>
+        <div class="dp-grid">
+          <div class="dp-row"><div class="dp-num">1</div><div class="dp-field">What is the alert?</div><div class="dp-why">Alert category, severity, rule triggered — understand what is being detected.</div></div>
+          <div class="dp-row"><div class="dp-num">2</div><div class="dp-field">Who / What is involved?</div><div class="dp-why">Source host, destination, user account, process — identify all entities.</div></div>
+          <div class="dp-row"><div class="dp-num">3</div><div class="dp-field">When did it happen?</div><div class="dp-why">Timestamp — business hours or off-hours? First occurrence or repeated?</div></div>
+          <div class="dp-row"><div class="dp-num">4</div><div class="dp-field">Is there any context?</div><div class="dp-why">What was happening before and after? Any related alerts or events?</div></div>
+          <div class="dp-row"><div class="dp-num">5</div><div class="dp-field">Is it malicious or benign?</div><div class="dp-why">Use OSINT, hash checks, and behavior to determine true/false positive.</div></div>
+          <div class="dp-row"><div class="dp-num">6</div><div class="dp-field">What action is needed?</div><div class="dp-why">Close / Monitor / Contain / Escalate — always document your decision.</div></div>
+        </div>
+      </div>
+
+      <!-- ── L1 GUIDELINE ── -->
+      <div class="guide-panel" id="gpanel-l1">
+        <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:14px 18px;margin-bottom:1.5rem;font-size:14px;color:#1e40af;font-weight:500;">
+          🎯 <strong>L1 Goal:</strong> Identify if the alert is a False Positive (FP) or needs escalation to L2.
+        </div>
+
+        <table class="guide-table">
+          <thead><tr><th>#</th><th>Action</th><th>Tool / Command</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr class="phase-row"><td colspan="4">Phase 1 — Alert Validation: "Is the alert real and relevant?"</td></tr>
+            <tr><td>1</td><td>Read the alert carefully</td><td>SIEM console</td><td>Identify alert name, severity, source host, user, timestamp, and rule triggered.</td></tr>
+            <tr><td>2</td><td>Check for duplicates / noise</td><td>SIEM search</td><td>Is this alert firing repeatedly from same host/user? Might be a noisy rule.</td></tr>
+            <tr><td>3</td><td>Validate context</td><td>SIEM (log view)</td><td>Check event details — IP, hostname, logon type, command line, parent process.</td></tr>
+            <tr><td>4</td><td>Check rule logic</td><td>SIEM rule reference</td><td>Understand what this detection means — e.g., "Anomalous process execution."</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 2 — File / Process Validation: "Is the artifact legitimate?"</td></tr>
+            <tr><td>5</td><td>Verify file signature</td><td>PowerShell → <code>Get-AuthenticodeSignature "file_path"</code></td><td>Signed and valid? If yes, likely safe.</td></tr>
+            <tr><td>6</td><td>Check file hash reputation</td><td>VirusTotal / HybridAnalysis</td><td>0 detections = probably FP. Many hits = malicious.</td></tr>
+            <tr><td>7</td><td>Validate file path</td><td>SIEM / EDR / endpoint</td><td>Legit: C:\Windows, C:\Program Files — Suspicious: AppData\Temp</td></tr>
+            <tr><td>8</td><td>Check parent process</td><td>SIEM / Sysmon Event ID 1</td><td>If spawned by legitimate parent (e.g., explorer.exe), usually normal.</td></tr>
+            <tr><td>9</td><td>Confirm process owner / user</td><td>SIEM / Windows Event ID 4688</td><td>SYSTEM or service account = normal; domain user = investigate.</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 3 — Behavioral Correlation: "Any signs of compromise?"</td></tr>
+            <tr><td>10</td><td>Check related events (before &amp; after)</td><td>SIEM timeline / EDR</td><td>Any suspicious commands, network calls, or registry changes?</td></tr>
+            <tr><td>11</td><td>Look for network indicators</td><td>EDR / Firewall logs</td><td>Outbound connections after process creation?</td></tr>
+            <tr><td>12</td><td>Review similar alerts from same host/user</td><td>SIEM search</td><td>Persistent activity → possible compromise.</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 4 — Documentation &amp; Handover</td></tr>
+            <tr><td>13</td><td>Document all findings</td><td>SIEM ticket</td><td>Record alert details, actions, hashes, screenshots, and reasoning.</td></tr>
+            <tr><td>14</td><td>Make decision</td><td>—</td><td>Close as FP (with justification) OR Escalate to L2 (with summary).</td></tr>
+            <tr><td>15</td><td>Add whitelist / tuning suggestion</td><td>SIEM tuning / detection feedback</td><td>Suggest suppression for similar false positives if legitimate.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="g-label">L1 Decision Shortcuts</div>
+        <div class="edge-list">
+          <div class="edge-row edge-ok">✅ File is signed + clean hash + expected path + known parent process → Mark as <strong>False Positive</strong>. Close.</div>
+          <div class="edge-row edge-warn">⚠️ File is unsigned OR unknown hash → Do not close. Escalate to L2.</div>
+          <div class="edge-row edge-warn">⚠️ Correlated activity looks suspicious (unusual network call, chained behavior) → Escalate to L2.</div>
+          <div class="edge-row edge-danger">🔴 Any signs of persistence, lateral movement, or data exfil → Escalate immediately.</div>
+        </div>
+      </div>
+
+      <!-- ── L2 GUIDELINE ── -->
+      <div class="guide-panel" id="gpanel-l2">
+        <div style="background:#faf5ff;border:1px solid #e9d5ff;border-radius:12px;padding:14px 18px;margin-bottom:1.5rem;font-size:14px;color:#6b21a8;font-weight:500;">
+          🎯 <strong>L2 Goal:</strong> Deeply investigate escalated alerts to determine if they are malicious, benign, or need further hunting.
+        </div>
+
+        <table class="guide-table">
+          <thead><tr><th>#</th><th>Action</th><th>Tool / Command</th><th>Result / Notes</th></tr></thead>
+          <tbody>
+            <tr class="phase-row"><td colspan="4">Phase 1 — Context Review: "What exactly happened?"</td></tr>
+            <tr><td>1</td><td>Review L1 notes &amp; SIEM data</td><td>Incident Ticket</td><td>Confirm alert details, affected host, user, and time. Reproduce event query if needed.</td></tr>
+            <tr><td>2</td><td>Understand detection rule logic</td><td>SIEM rule definition</td><td>Know what behavior the rule detects (e.g., registry modification, PowerShell anomaly).</td></tr>
+            <tr><td>3</td><td>Re-collect raw events</td><td>SIEM / EDR query</td><td>Pull 15–30 min window before &amp; after the event for full context.</td></tr>
+            <tr><td>4</td><td>Identify all affected entities</td><td>SIEM search</td><td>Host, user, process, file, registry key, IP, domain.</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 2 — File / Process Deep Validation: "What is this binary doing?"</td></tr>
+            <tr><td>5</td><td>Re-check signature &amp; hash</td><td>PowerShell Get-FileHash, PEStudio, VirusTotal</td><td>Confirm integrity and reputation.</td></tr>
+            <tr><td>6</td><td>Extract metadata &amp; strings</td><td>PEStudio / Strings / ExifTool</td><td>Look for suspicious imports, URLs, commands.</td></tr>
+            <tr><td>7</td><td>Behavioral sandboxing (if unknown)</td><td>Any.Run, HybridAnalysis</td><td>Observe network calls, file writes, persistence.</td></tr>
+            <tr><td>8</td><td>Check persistence locations</td><td>Autoruns / Registry / Task Scheduler</td><td>HKLM\SYSTEM\CurrentControlSet\Services\, Run keys.</td></tr>
+            <tr><td>9</td><td>Correlate parent-child tree</td><td>EDR process tree</td><td>Confirm expected chain (e.g., services.exe → legitimate driver).</td></tr>
+            <tr><td>10</td><td>Correlate system logs</td><td>Sysmon ID 1/7045, Windows 4688/4697</td><td>Validate installation method.</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 3 — Host &amp; Network Correlation: "Evidence of compromise?"</td></tr>
+            <tr><td>11</td><td>Host triage</td><td>EDR / Memory dump</td><td>Look for unusual processes, DLL injections, network sockets.</td></tr>
+            <tr><td>12</td><td>Network correlation</td><td>Firewall / Proxy / DNS logs</td><td>Any external connections or C2 patterns?</td></tr>
+            <tr><td>13</td><td>Cross-host correlation</td><td>SIEM query by hash / filename</td><td>See if same artifact exists on multiple systems.</td></tr>
+            <tr><td>14</td><td>Threat Intel enrichment</td><td>MISP / VirusTotal / internal feed</td><td>Match IoCs (domains, hashes, IPs) with known campaigns.</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 4 — Risk Assessment &amp; Decision</td></tr>
+            <tr><td>15</td><td>Assess intent and impact</td><td>Analyst judgment</td><td>Does activity align with business software or attacker behavior?</td></tr>
+            <tr><td>16</td><td>Check policy / change records</td><td>CMDB / IT Change Mgmt</td><td>If legitimate IT maintenance, mark benign.</td></tr>
+            <tr><td>17</td><td>Decide classification</td><td>—</td><td>False Positive / Benign / Suspicious / Confirmed Malicious</td></tr>
+            <tr><td>18</td><td>Recommend actions</td><td>—</td><td>Containment, isolation, block hash/domain, tune rule.</td></tr>
+            <tr class="phase-row"><td colspan="4">Phase 5 — Reporting &amp; Knowledge Sharing</td></tr>
+            <tr><td>19</td><td>Document investigation</td><td>Case Mgmt / SOAR ticket</td><td>Include screenshots, IoCs, reasoning, results.</td></tr>
+            <tr><td>20</td><td>Feed results to Threat Intel / L3</td><td>TI platform / Ticket escalation</td><td>Share new indicators or detection gaps.</td></tr>
+            <tr><td>21</td><td>Tune detection if FP</td><td>SIEM rule exception</td><td>Add condition or whitelist to reduce noise.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- ── L3 GUIDELINE ── -->
+      <div class="guide-panel" id="gpanel-l3">
+        <div style="background:#fef2f2;border:1px solid #fecaca;border-radius:12px;padding:14px 18px;margin-bottom:1.5rem;font-size:14px;color:#991b1b;font-weight:500;">
+          🎯 <strong>L3 Goal:</strong> Root-cause analysis, threat hunting, reverse engineering, and strengthening detection logic.
+        </div>
+
+        <table class="guide-table">
+          <thead><tr><th>#</th><th>Action</th><th>Tool / Platform</th><th>Result / Notes</th></tr></thead>
+          <tbody>
+            <tr><td>1</td><td>Review escalated L2 case &amp; confirm hypothesis</td><td>Incident Ticket</td><td>Read L2 summary, confirm data completeness, identify gaps.</td></tr>
+            <tr><td>2</td><td>Deep correlation across environment</td><td>SIEM, EDR, Network telemetry</td><td>Identify lateral movement, related hosts, user sessions.</td></tr>
+            <tr><td>3</td><td>Reverse engineering / advanced static analysis</td><td>Ghidra, IDA Free, dnSpy</td><td>Understand executable purpose, APIs, obfuscation.</td></tr>
+            <tr><td>4</td><td>Memory and forensic analysis</td><td>Volatility, KAPE, FTK Imager</td><td>Look for in-memory implants, injected threads, persistence.</td></tr>
+            <tr><td>5</td><td>Advanced network behavior analysis</td><td>Zeek, Wireshark, Suricata, Threat Intel feeds</td><td>Detect beaconing, C2 communications, anomalies.</td></tr>
+            <tr><td>6</td><td>Correlate MITRE ATT&amp;CK techniques</td><td>MITRE ATT&amp;CK Navigator</td><td>Map all identified TTPs to tactics for reporting.</td></tr>
+            <tr><td>7</td><td>Create detection logic &amp; validate hypothesis</td><td>Rule Creation</td><td>Develop and test new detections or hunts for missed activity.</td></tr>
+            <tr><td>8</td><td>Perform threat hunting</td><td>SIEM, EDR, Sysmon datasets</td><td>Search for indicators, similar activity across enterprise.</td></tr>
+            <tr><td>9</td><td>Containment / Response coordination</td><td>SOAR, EDR isolation commands</td><td>Work with IR team to contain affected endpoints/users.</td></tr>
+            <tr><td>10</td><td>Post-incident report &amp; detection feedback</td><td>Internal knowledge base / Threat Intel platform</td><td>Document root cause, update detections, share IOCs.</td></tr>
+          </tbody>
+        </table>
+
+        <div class="g-label">L3 Specialist Tools</div>
+        <div class="tools-grid">
+          <div class="tool-tile"><div class="tool-cat">Reverse Eng.</div><div class="tool-name">Ghidra</div><div class="tool-desc">NSA open-source reverse engineering</div></div>
+          <div class="tool-tile"><div class="tool-cat">Reverse Eng.</div><div class="tool-name">IDA Free</div><div class="tool-desc">Binary disassembler and debugger</div></div>
+          <div class="tool-tile"><div class="tool-cat">Reverse Eng.</div><div class="tool-name">dnSpy</div><div class="tool-desc">.NET decompiler and debugger</div></div>
+          <div class="tool-tile"><div class="tool-cat">Forensics</div><div class="tool-name">Volatility</div><div class="tool-desc">Memory forensics framework</div></div>
+          <div class="tool-tile"><div class="tool-cat">Forensics</div><div class="tool-name">KAPE</div><div class="tool-desc">Fast forensic artifact collection</div></div>
+          <div class="tool-tile"><div class="tool-cat">Forensics</div><div class="tool-name">FTK Imager</div><div class="tool-desc">Disk imaging and preview</div></div>
+          <div class="tool-tile"><div class="tool-cat">Network</div><div class="tool-name">Wireshark</div><div class="tool-desc">Packet capture and analysis</div></div>
+          <div class="tool-tile"><div class="tool-cat">Network</div><div class="tool-name">Zeek / Suricata</div><div class="tool-desc">Network security monitoring</div></div>
+          <div class="tool-tile"><div class="tool-cat">Intel</div><div class="tool-name">MITRE ATT&amp;CK</div><div class="tool-desc">TTP mapping and threat modeling</div></div>
+        </div>
+      </div>
+
+      <!-- ── ALERT SUMMARY ── -->
+      <div class="guide-panel" id="gpanel-summary">
+        <div class="g-label">Overall Alert Volume — Top Counts</div>
+        <div class="stat-grid">
+          <div class="stat-card"><div class="stat-icon">🎯</div><div><div class="stat-num">314</div><div class="stat-label">Intel Hit Based on IP</div></div></div>
+          <div class="stat-card"><div class="stat-icon">📧</div><div><div class="stat-num">200</div><div class="stat-label">Email First Seen Sender</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🔒</div><div><div class="stat-num">141</div><div class="stat-label">Indicative of Ransomware</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🛡</div><div><div class="stat-num">94</div><div class="stat-label">Intrusion Blocked</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🔐</div><div><div class="stat-num">89</div><div class="stat-label">SSH Connection Detected</div></div></div>
+          <div class="stat-card"><div class="stat-icon">⚙️</div><div><div class="stat-num">69</div><div class="stat-label">WinRM Connection Detected</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🔑</div><div><div class="stat-num">49</div><div class="stat-label">Password Brute Force</div></div></div>
+          <div class="stat-card"><div class="stat-icon">💻</div><div><div class="stat-num">34</div><div class="stat-label">DNS Request by PowerShell</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🌐</div><div><div class="stat-num">34</div><div class="stat-label">Network Request by PowerShell</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🔗</div><div><div class="stat-num">32</div><div class="stat-label">Anomalous Network Connection</div></div></div>
+          <div class="stat-card"><div class="stat-icon">🗜️</div><div><div class="stat-num">24</div><div class="stat-label">Potential 7-Zip Encryption</div></div></div>
+          <div class="stat-card"><div class="stat-icon">📊</div><div><div class="stat-num">12,489</div><div class="stat-label">Total Alerts (Grand Total)</div></div></div>
+        </div>
+
+        <div class="g-label">Full Alert Breakdown</div>
+        <div style="overflow-x:auto;border-radius:10px;border:1px solid #e4e7ed;">
+        <table class="summary-table">
+          <thead><tr><th>Alert Type</th><th style="text-align:right">Count</th><th style="width:200px">Volume</th></tr></thead>
+          <tbody id="summaryTbody"></tbody>
+        </table>
+        </div>
+      </div>
+
+    </div><!-- end guide-body -->
+  </div><!-- end guideView -->
+
+  <!-- SOP -->
+  <div id="sopView">
+    <div class="sop-topbar">
+      <button class="back-btn" onclick="goHome()">← Back</button>
+      <div class="sop-topbar-title" id="sopTopTitle"></div>
+      <span class="sop-topbar-sev" id="sopTopSev"></span>
+      <div class="progress-wrap">
+        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progressFill" style="width:0%"></div></div>
+        <span class="progress-text" id="progressText">0 / 0</span>
+      </div>
+    </div>
+    <div class="sop-body" id="sopBody"></div>
+  </div>
+
+</div>
+
+<script>
+const PW = 'soc@k7';
+
+const ICONS = {
+  'intel-ip':'🎯','email-first-seen':'📧','ransomware':'🔒','intrusion-blocked':'🛡',
+  'ssh':'🔐','winrm':'⚙️','pwd-bruteforce':'🔓','dns-powershell':'💻',
+  'net-powershell':'🌐','anomalous-bruteforce':'🔑','anomalous-net':'🔗',
+  'tunnel-up':'🚇','remote-file':'📁','7zip':'🗜️',
+  'malware':'🦠','phishing':'🎣','data-exfil':'📤','brute-force':'🚨'
+};
+
+const SEV_CLASS  = {critical:'sev-critical',high:'sev-high',medium:'sev-medium',low:'sev-low'};
+const ICON_CLASS = {critical:'icon-critical',high:'icon-high',medium:'icon-medium',low:'icon-low'};
+
+const PLAYBOOKS = [
+
+  /* ===== 1. INTEL HIT BASED ON IP ===== */
+  {
+    id:'intel-ip', severity:'critical', cat:'network',
+    title:'Intel Hit Based on IP',
+    subtitle:'L1 Analyst Investigation Flow',
+    tags:['SIEM','XDR','OSINT','Firewall','IP Reputation'],
+    dataPoints:[
+      {field:'Source IP',        extract:'src.ipv4',           why:'Identify the initiating host'},
+      {field:'Destination IP',   extract:'dst.ipv4',           why:'Identify the target endpoint'},
+      {field:'Port / Protocol',  extract:'dst.port / tcp/udp', why:'Identify service/communication type'},
+      {field:'Hostname / Asset', extract:'host.name',          why:'Asset identification'},
+      {field:'Action',           extract:'ALLOW / DENY',       why:'Was the connection permitted?'},
+      {field:'Direction',        extract:'Inbound / Outbound', why:'Traffic flow context'},
+    ],
+    steps:[
+      {id:'s1',  action:'Confirm the alert in SIEM — note alert name, source IP, destination IP, action and direction', tool:'SIEM', outcome:'Alert confirmed and fields extracted', type:'action'},
+      {id:'s2',  action:'Check traffic direction: is it Inbound (External→Internal) or Outbound (Internal→External)?', tool:'SIEM', outcome:'Direction established', type:'decision'},
+      {id:'s3',  action:'Check the Firewall action — is it ALLOW or DENY?', tool:'SIEM / Firewall Logs', outcome:'DENY = usually safe. ALLOW = investigate further.', type:'decision'},
+      {id:'s4',  action:'INBOUND + DENY: No endpoint communication? → Close as Benign', tool:'SIEM', outcome:'Closed — firewall blocked it', type:'close'},
+      {id:'s5',  action:'INBOUND + ALLOW: Investigate deeply — check what happened after connection was allowed', tool:'SIEM / EDR', outcome:'Activity after allow identified', type:'escalate'},
+      {id:'s6',  action:'OUTBOUND: Identify the internal asset making the connection (hostname, user)', tool:'SIEM / EDR', outcome:'Asset and user identified', type:'action'},
+      {id:'s7',  action:'Check frequency of connections in last 24h and 7 days', tool:'SIEM', outcome:'Single hit or repeated pattern', type:'action'},
+      {id:'s8',  action:'Run OSINT on the IP — check reputation on AbuseIPDB, VirusTotal, Shodan', tool:'AbuseIPDB, VirusTotal, Shodan, WHOIS', outcome:'IP is malicious / suspicious / clean', type:'action'},
+      {id:'s9',  action:'Is the IP a trusted CDN/cloud (Microsoft, Fastly, Cloudflare, AWS)? Validate process using that IP', tool:'WHOIS / Manual check', outcome:'Trusted IP but check the process using it', type:'decision'},
+      {id:'s10', action:'If Malicious IP + ALLOW + Endpoint activity → Escalate + Block', tool:'Firewall Team (Jithu)', outcome:'IP blocked, incident escalated', type:'escalate'},
+      {id:'s11', action:'Document all findings — OSINT results, direction, action, decision — and close or escalate', tool:'SIEM Ticketing', outcome:'Incident documented', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',  name:'Cylerian SIEM',  desc:'Alert triage & log search'},
+      {cat:'XDR',   name:'K7InfiniShield', desc:'Endpoint visibility'},
+      {cat:'OSINT', name:'AbuseIPDB',      desc:'IP reputation score'},
+      {cat:'OSINT', name:'VirusTotal',     desc:'Hash, URL & IP scan'},
+      {cat:'OSINT', name:'Shodan',         desc:'IP/port exposure check'},
+      {cat:'OSINT', name:'WHOIS',          desc:'IP ownership details'},
+    ],
+    escalation:[
+      {trigger:'Inbound + ALLOW from malicious IP',      action:'Escalate to Jithu (Firewall) + L2'},
+      {trigger:'Outbound to confirmed malicious IP',     action:'Block IP + Escalate'},
+      {trigger:'Same IP hitting multiple assets',        action:'Treat as campaign — Escalate to SOC Lead'},
+      {trigger:'Critical asset targeted',               action:'Immediate escalation'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'0 bytes transferred → Connection failed / reset. Close as Benign.'},
+      {type:'ok',     text:'Only DENY logs → Internet scanning. Close as Benign.'},
+      {type:'warn',   text:'Trusted IP (Microsoft) + Unknown process → Investigate the process, not just the IP.'},
+      {type:'danger', text:'ALLOW + Malicious IP + Endpoint activity → True Positive. Escalate + Block immediately.'},
+    ],
+    quickDecision:[
+      {rule:'Inbound + DENY',          action:'Close', cls:'td-close'},
+      {rule:'Inbound + ALLOW',         action:'Investigate / Escalate', cls:'td-esc'},
+      {rule:'Outbound + Known clean IP', action:'Close', cls:'td-close'},
+      {rule:'Outbound + Unknown IP',   action:'Investigate', cls:'td-inv'},
+      {rule:'Outbound + Malicious IP', action:'Block + Escalate', cls:'td-esc'},
+      {rule:'Trusted IP + Normal process', action:'Close', cls:'td-close'},
+      {rule:'Trusted IP + Abnormal process', action:'Investigate', cls:'td-inv'},
+    ]
+  },
+
+  /* ===== 2. EMAIL FIRST SEEN SENDER ===== */
+  {
+    id:'email-first-seen', severity:'medium', cat:'email',
+    title:'Email First Seen Sender',
+    subtitle:'Email Analysis & Phishing Triage',
+    tags:['Email','SPF','DKIM','DMARC','Phishing','OSINT'],
+    dataPoints:[
+      {field:'From Address',      extract:'email.from',        why:'Is the sender spoofed or legitimate?'},
+      {field:'Reply-To',          extract:'email.reply_to',    why:'Detect reply-to redirect attacks'},
+      {field:'Return-Path',       extract:'email.return_path', why:'Compare with From — spoof check'},
+      {field:'Received Headers',  extract:'email.received',    why:'Trace originating IP (read bottom to top)'},
+      {field:'SPF / DKIM / DMARC',extract:'auth.results',      why:'Authentication pass/fail status'},
+      {field:'Attachment Hash',   extract:'file.hash.sha256',  why:'Malware payload check'},
+      {field:'URLs in Email',     extract:'url.full',          why:'Malicious link detection'},
+    ],
+    steps:[
+      {id:'s1', action:'Read the alert: Who sent the email? What are the From, Reply-To and Return-Path fields?', tool:'Email Headers', outcome:'Sender identity captured', type:'action'},
+      {id:'s2', action:'Check authentication: Did SPF, DKIM and DMARC pass or fail?', tool:'Header Analyzer / MXToolbox', outcome:'Auth status known', type:'decision'},
+      {id:'s3', action:'Check sending IP reputation (look at the bottom "Received" header for origin IP)', tool:'AbuseIPDB, VirusTotal', outcome:'IP reputation scored', type:'action'},
+      {id:'s4', action:'Check sender domain age and reputation — is it newly registered?', tool:'WHOIS, MXToolbox', outcome:'Legit vs suspicious domain', type:'action'},
+      {id:'s5', action:'Is there an attachment? Download safely and analyze in sandbox', tool:'ANY.RUN, Hybrid Analysis', outcome:'Malicious or benign attachment', type:'action'},
+      {id:'s6', action:'Are there URLs? Extract all URLs and scan them', tool:'VirusTotal, URLScan.io', outcome:'Malicious or clean URLs', type:'action'},
+      {id:'s7', action:'Review email body — any urgency, credential requests, grammar errors, HTML obfuscation?', tool:'Email client / W3Schools HTML viewer', outcome:'Phishing indicators identified', type:'decision'},
+      {id:'s8', action:'Classify the email: Benign / Spam / Suspicious / Phishing / Malware', tool:'Analyst judgment', outcome:'Classification complete', type:'decision'},
+      {id:'s9', action:'Document findings and take action: close, block sender, or escalate', tool:'SIEM Ticketing', outcome:'Incident closed or escalated', type:'close'},
+    ],
+    tools:[
+      {cat:'OSINT',   name:'AbuseIPDB',       desc:'Sending IP reputation'},
+      {cat:'OSINT',   name:'VirusTotal',      desc:'URL / attachment scan'},
+      {cat:'OSINT',   name:'URLScan.io',      desc:'URL behavior & screenshot'},
+      {cat:'Sandbox', name:'ANY.RUN',         desc:'Attachment sandbox analysis'},
+      {cat:'DNS',     name:'MXToolbox',       desc:'SPF / DKIM / DMARC check'},
+      {cat:'OSINT',   name:'WHOIS',           desc:'Domain age and ownership'},
+    ],
+    escalation:[
+      {trigger:'Malicious attachment confirmed',  action:'Escalate to Malware Lab'},
+      {trigger:'Phishing / credential harvesting',action:'Report to client + block sender'},
+      {trigger:'SPF + DKIM + DMARC all fail',     action:'High confidence spoof — Escalate'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'SPF + DKIM + DMARC all pass → Not auto-safe. Still check content, URLs, attachment.'},
+      {type:'warn',   text:'DKIM fail alone ≠ phishing. Could be mail gateway modification. Check content too.'},
+      {type:'warn',   text:'SPF fail but DKIM pass → Common in forwarded emails. Verify context.'},
+      {type:'danger', text:'All three fail (SPF + DKIM + DMARC) → High confidence spoofing. Escalate immediately.'},
+    ],
+    quickDecision:[
+      {rule:'All auth pass + clean content',    action:'Close', cls:'td-close'},
+      {rule:'First seen + unknown domain',      action:'Investigate', cls:'td-inv'},
+      {rule:'SPF/DKIM/DMARC all fail',          action:'Escalate', cls:'td-esc'},
+      {rule:'Attachment present',               action:'Always analyze in sandbox', cls:'td-inv'},
+      {rule:'URL present',                      action:'Always scan in VirusTotal', cls:'td-inv'},
+      {rule:'Phishing indicators',              action:'Escalate', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 3. RANSOMWARE (Indicative of Ransomware) ===== */
+  {
+    id:'ransomware', severity:'critical', cat:'malware',
+    title:'Ransomware Detection',
+    subtitle:'Multiple Files with Similar Extension',
+    tags:['EDR','Ransomware','Endpoint','K7','Isolation'],
+    dataPoints:[
+      {field:'Hostname / Endpoint',  extract:'host.name',       why:'Identify affected system'},
+      {field:'File Extension Pattern',extract:'file.extension', why:'Look for .locked, .enc, .crypted, random'},
+      {field:'File Creation Count',  extract:'event.count',     why:'Bulk creation = encryption behavior'},
+      {field:'Time Window',          extract:'meta.created',    why:'Rapid burst = ransomware pattern'},
+      {field:'Process Name',         extract:'process.name',    why:'What process is creating the files?'},
+      {field:'File Hash',            extract:'file.hash.sha256',why:'Reputation check'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the alert — how many files were created and in what time window?', tool:'SIEM / EDR (K7)', outcome:'Volume and speed confirmed', type:'action'},
+      {id:'s2', action:'Check the file extension pattern — .locked, .enc, .crypted, random extension?', tool:'SIEM / EDR', outcome:'Suspicious extension confirmed', type:'decision'},
+      {id:'s3', action:'Identify the process creating the files — is it unknown or suspicious?', tool:'K7 InfiniShield', outcome:'Source process identified', type:'action'},
+      {id:'s4', action:'⚠️ CRITICAL: Is the endpoint online? If YES — ISOLATE IMMEDIATELY', tool:'K7 InfiniShield', outcome:'Endpoint isolated to stop spread', type:'escalate'},
+      {id:'s5', action:'Block the malicious file hash in K7 EDR', tool:'K7 InfiniShield', outcome:'Hash blocked — execution prevented', type:'action'},
+      {id:'s6', action:'Check SIEM for same extension pattern or file hash on other endpoints', tool:'SIEM', outcome:'Lateral spread identified or ruled out', type:'action'},
+      {id:'s7', action:'Check network activity from endpoint — any outbound C2 connections?', tool:'SIEM / Firewall', outcome:'C2 communication identified or cleared', type:'action'},
+      {id:'s8', action:'Run hash on VirusTotal and Hybrid Analysis to confirm malicious nature', tool:'VirusTotal, Hybrid Analysis', outcome:'Malware confirmed', type:'action'},
+      {id:'s9', action:'Escalate to Malware Lab and notify client', tool:'Internal escalation', outcome:'Incident escalated', type:'escalate'},
+      {id:'s10',action:'Document all findings — endpoint, files, process, hash, spread', tool:'SIEM Ticketing', outcome:'Full incident documented', type:'close'},
+    ],
+    tools:[
+      {cat:'XDR',      name:'K7 InfiniShield', desc:'Endpoint detection, isolation & hash block'},
+      {cat:'OSINT',    name:'VirusTotal',       desc:'File hash reputation'},
+      {cat:'Sandbox',  name:'Hybrid Analysis',  desc:'Deep malware analysis'},
+      {cat:'SIEM',     name:'Cylerian SIEM',    desc:'Spread correlation'},
+    ],
+    escalation:[
+      {trigger:'Ransomware confirmed',         action:'Isolate endpoint + Escalate to Malware Lab'},
+      {trigger:'Multiple endpoints affected',  action:'Declare Critical Incident — SOC Lead + IR Team'},
+      {trigger:'Shared drives encrypted',      action:'Network-wide risk — Critical incident response'},
+      {trigger:'Business impact',             action:'Notify client immediately'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Backup software creating files → Verify process path. Likely benign.'},
+      {type:'ok',     text:'Compression tool (zip/rar) → Check file type and user intent.'},
+      {type:'warn',   text:'Single endpoint, limited scope → Still HIGH risk. Isolate first, investigate after.'},
+      {type:'danger', text:'Multiple endpoints + same hash → Active outbreak. Critical Incident. Isolate all immediately.'},
+    ],
+    quickDecision:[
+      {rule:'Unknown process + bulk files + random extension', action:'Isolate + Escalate', cls:'td-esc'},
+      {rule:'Known backup/compression tool',                   action:'Verify + Close', cls:'td-close'},
+      {rule:'Script (PowerShell/CMD) creating files',         action:'Investigate', cls:'td-inv'},
+      {rule:'Multiple endpoints affected',                     action:'Critical Incident', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 4. INTRUSION BLOCKED ===== */
+  {
+    id:'intrusion-blocked', severity:'high', cat:'network',
+    title:'Intrusion Blocked',
+    subtitle:'Network Intrusion Attempt SOP',
+    tags:['Firewall','IDS','NABU','SIEM','Network','Scan'],
+    dataPoints:[
+      {field:'Source IP',       extract:'src.ipv4',  why:'Identify attacker origin'},
+      {field:'Destination IP',  extract:'dst.ipv4',  why:'Identify target asset'},
+      {field:'Port / Service',  extract:'dst.port',  why:'What service is being targeted?'},
+      {field:'Direction',       extract:'Inbound / Outbound / Internal', why:'Traffic flow context'},
+      {field:'Frequency',       extract:'event.count', why:'Single attempt vs sustained attack'},
+      {field:'Internal IP',     extract:'src.ipv4 (internal)', why:'Is an internal host involved?'},
+    ],
+    steps:[
+      {id:'s1', action:'Extract source IP, destination IP, port and direction from the alert', tool:'SIEM (Cylerian)', outcome:'All fields noted', type:'action'},
+      {id:'s2', action:'Identify which IP belongs to your internal network', tool:'SIEM / Asset DB', outcome:'Internal asset identified', type:'action'},
+      {id:'s3', action:'Determine traffic direction: External→Internal / Internal→External / Internal→Internal', tool:'SIEM', outcome:'Direction confirmed', type:'decision'},
+      {id:'s4', action:'INTERNAL→INTERNAL SCAN: Check if the scanning endpoint has a NABU sensor', tool:'Cylerian XDR', outcome:'NABU present = security scan (Benign). No NABU = Suspicious.', type:'decision'},
+      {id:'s5', action:'EXTERNAL→INTERNAL: Check external IP reputation on AbuseIPDB and Shodan', tool:'AbuseIPDB, Shodan', outcome:'Malicious / suspicious / clean', type:'action'},
+      {id:'s6', action:'Check the targeted port — is it 22 (SSH), 3389 (RDP), 445 (SMB), or multiple ports?', tool:'SIEM', outcome:'Attack type identified', type:'decision'},
+      {id:'s7', action:'Check frequency — single attempt (normal scanning) or continuous (active attack)?', tool:'SIEM', outcome:'Attack intensity understood', type:'action'},
+      {id:'s8', action:'Check endpoint in XDR — any suspicious processes or abnormal activity?', tool:'Cylerian XDR', outcome:'Endpoint clean or suspicious', type:'action'},
+      {id:'s9', action:'Make decision: Close / Monitor / Block / Escalate', tool:'SOC / Firewall Team', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',    name:'Cylerian SIEM', desc:'Alert triage & correlation'},
+      {cat:'XDR',     name:'Cylerian XDR', desc:'Endpoint visibility & NABU check'},
+      {cat:'OSINT',   name:'AbuseIPDB',    desc:'External IP reputation'},
+      {cat:'OSINT',   name:'Shodan',       desc:'IP exposure and services'},
+      {cat:'Firewall',name:'Jithu (FW)',   desc:'IP blocking'},
+    ],
+    escalation:[
+      {trigger:'Internal scan without NABU sensor', action:'Escalate to SOC L2 — investigate endpoint'},
+      {trigger:'Confirmed external attack',          action:'Block IP — contact Firewall Team (Jithu)'},
+      {trigger:'Internal lateral movement suspected',action:'Critical — Escalate to SOC Lead'},
+      {trigger:'Multiple targets from same source',  action:'Treat as active campaign — Escalate'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Internal scan + NABU sensor present → Legitimate security scan. Close as Benign.'},
+      {type:'ok',     text:'Known IT vulnerability scanner IP → Confirm and close.'},
+      {type:'warn',   text:'External IP + multiple port scan → Reconnaissance activity. Monitor.'},
+      {type:'danger', text:'Internal→Internal scan without NABU + unusual ports → Possible lateral movement. Escalate.'},
+    ],
+    quickDecision:[
+      {rule:'Internal scan + NABU sensor',     action:'Close (Benign)', cls:'td-close'},
+      {rule:'Internal scan, no NABU',          action:'Escalate', cls:'td-esc'},
+      {rule:'External malicious IP',           action:'Block + Escalate', cls:'td-esc'},
+      {rule:'Internal → External unusual',     action:'Check endpoint', cls:'td-inv'},
+      {rule:'Multiple targets, same IP',       action:'Treat as scan — Escalate', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 5. SSH CONNECTION DETECTED ===== */
+  {
+    id:'ssh', severity:'medium', cat:'network',
+    title:'SSH Connection Detected',
+    subtitle:'Port 22 Investigation SOP',
+    tags:['SSH','Port 22','Firewall','SIEM','Brute Force'],
+    dataPoints:[
+      {field:'Source IP',       extract:'src.ipv4',      why:'Who is connecting?'},
+      {field:'Destination IP',  extract:'dst.ipv4',      why:'What is being targeted?'},
+      {field:'Destination Port',extract:'dst.port = 22', why:'Confirm SSH traffic'},
+      {field:'Firewall Action', extract:'deny/allow/accept/reset', why:'Most critical — was it blocked or allowed?'},
+      {field:'Direction',       extract:'Inbound / Internal / Outbound', why:'Attack direction context'},
+      {field:'Frequency',       extract:'event.count',   why:'Brute force pattern check'},
+    ],
+    steps:[
+      {id:'s1', action:'Extract all fields: Source IP, Destination IP, Port (22 = SSH), Firewall action, Direction', tool:'SIEM (Cylerian)', outcome:'All fields noted', type:'action'},
+      {id:'s2', action:'⭐ FIRST CHECK: What is the firewall action — deny, drop, reset, allow, or accept?', tool:'SIEM', outcome:'Action = deny/drop/reset → Close immediately. allow/accept → Continue.', type:'decision'},
+      {id:'s3', action:'ACTION = DENY/DROP/RESET: No data transferred. Close ticket immediately.', tool:'SIEM', outcome:'Closed — firewall handled it', type:'close'},
+      {id:'s4', action:'ACTION = ALLOW/ACCEPT: Check direction — Internal→Internal, Internal→External, or External→Internal?', tool:'SIEM', outcome:'Direction confirmed', type:'decision'},
+      {id:'s5', action:'External→Internal SSH ALLOWED: High risk! Investigate deeply — who is accessing what?', tool:'SIEM / XDR', outcome:'Unauthorized access potential', type:'escalate'},
+      {id:'s6', action:'Check frequency — multiple attempts = brute force pattern', tool:'SIEM', outcome:'Single hit vs sustained attack', type:'action'},
+      {id:'s7', action:'Validate external IP reputation if applicable', tool:'AbuseIPDB, Shodan', outcome:'Known attacker IP or clean', type:'action'},
+      {id:'s8', action:'Check endpoint in XDR for any unusual processes or activity', tool:'Cylerian XDR', outcome:'Endpoint clean or suspicious', type:'action'},
+      {id:'s9', action:'Decision: Close (deny) / Monitor / Block IP / Escalate (allow + external)', tool:'SOC / Firewall', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',    name:'Cylerian SIEM', desc:'Alert triage'},
+      {cat:'XDR',     name:'Cylerian XDR', desc:'Endpoint validation'},
+      {cat:'OSINT',   name:'AbuseIPDB',    desc:'IP reputation'},
+      {cat:'OSINT',   name:'Shodan',       desc:'SSH exposure check'},
+      {cat:'Firewall',name:'Jithu (FW)',   desc:'IP blocking'},
+    ],
+    escalation:[
+      {trigger:'External SSH allowed (inbound)',   action:'Block IP — Firewall Team (Jithu)'},
+      {trigger:'SSH brute force pattern',          action:'Block source IP + escalate'},
+      {trigger:'Suspicious process after SSH',     action:'Escalate to Malware Lab'},
+      {trigger:'Internal lateral movement via SSH',action:'Escalate to SOC L2'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Firewall action = deny/drop/reset → Blocked successfully. Close immediately.'},
+      {type:'ok',     text:'IT admin SSH activity to known server → Validate with client and close.'},
+      {type:'warn',   text:'Multiple SSH attempts from same source → Brute force. Block source.'},
+      {type:'danger', text:'External SSH allowed + unknown source → Unauthorized access attempt. Escalate immediately.'},
+    ],
+    quickDecision:[
+      {rule:'Action = deny/drop/reset', action:'Close immediately', cls:'td-close'},
+      {rule:'Action = allow/accept',    action:'Investigate', cls:'td-inv'},
+      {rule:'External → Internal allowed', action:'Escalate', cls:'td-esc'},
+      {rule:'Multiple attempts',        action:'Brute force — Block', cls:'td-esc'},
+      {rule:'Known admin activity',     action:'Validate & close', cls:'td-close'},
+    ]
+  },
+
+  /* ===== 6. WINRM CONNECTION DETECTED ===== */
+  {
+    id:'winrm', severity:'high', cat:'network',
+    title:'WinRM Connection Detected',
+    subtitle:'Port 5985/5986 Investigation SOP',
+    tags:['WinRM','PowerShell','Lateral Movement','SIEM','Port 5985'],
+    dataPoints:[
+      {field:'Source IP',       extract:'src.ipv4',           why:'Who is connecting?'},
+      {field:'Destination IP',  extract:'dst.ipv4',           why:'What is being targeted?'},
+      {field:'Port',            extract:'5985 (HTTP) / 5986 (HTTPS)', why:'Confirm WinRM traffic'},
+      {field:'Firewall Action', extract:'deny/allow/accept',   why:'Was it blocked or allowed?'},
+      {field:'Direction',       extract:'Inbound / Internal / Outbound', why:'Attack direction'},
+      {field:'Process',         extract:'wsmprovhost.exe / powershell.exe', why:'WinRM execution indicator'},
+    ],
+    steps:[
+      {id:'s1', action:'Extract fields: Source IP, Destination, Port (5985/5986 = WinRM), Action, Direction', tool:'SIEM (Cylerian)', outcome:'All fields noted', type:'action'},
+      {id:'s2', action:'⭐ FIRST CHECK: Firewall action = deny/drop/reset → Close immediately', tool:'SIEM', outcome:'Action determined', type:'decision'},
+      {id:'s3', action:'ACTION = DENY: No impact — firewall blocked. Close ticket.', tool:'SIEM', outcome:'Closed', type:'close'},
+      {id:'s4', action:'ACTION = ALLOW: Check direction. External→Internal = highest risk', tool:'SIEM', outcome:'Direction confirmed', type:'decision'},
+      {id:'s5', action:'External→Internal WinRM ALLOWED: Remote execution path open! Escalate immediately', tool:'SIEM / XDR', outcome:'Critical — escalated', type:'escalate'},
+      {id:'s6', action:'Internal→Internal WinRM: Check endpoint for wsmprovhost.exe or PowerShell process', tool:'K7 InfiniShield / EDR', outcome:'Lateral movement or admin activity', type:'action'},
+      {id:'s7', action:'PowerShell via WinRM = HIGH RISK. Check command-line arguments for suspicious flags', tool:'EDR / XDR', outcome:'Malicious commands or clean', type:'decision'},
+      {id:'s8', action:'Check frequency and external IP reputation if applicable', tool:'SIEM / AbuseIPDB', outcome:'Pattern identified', type:'action'},
+      {id:'s9', action:'Decision: Close (deny) / Verify admin / Block + Escalate', tool:'SOC / Firewall', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',    name:'Cylerian SIEM', desc:'Alert triage'},
+      {cat:'XDR',     name:'K7 InfiniShield', desc:'Process validation'},
+      {cat:'OSINT',   name:'AbuseIPDB',    desc:'External IP reputation'},
+      {cat:'Firewall',name:'Jithu (FW)',   desc:'IP blocking'},
+    ],
+    escalation:[
+      {trigger:'External WinRM allowed',         action:'Block IP immediately — Firewall Team (Jithu)'},
+      {trigger:'PowerShell remote commands',     action:'Investigate for lateral movement — SOC L2'},
+      {trigger:'Unknown host using WinRM',       action:'Escalate — unauthorized access'},
+      {trigger:'Multiple WinRM attempts',        action:'Brute force pattern — Block source'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Action = deny → Firewall blocked. No impact. Close immediately.'},
+      {type:'ok',     text:'IT automation tools (SCCM, scripts) → Confirm with team and close.'},
+      {type:'warn',   text:'Internal→Internal WinRM + unknown source host → Possible lateral movement.'},
+      {type:'danger', text:'External→Internal WinRM allowed → Direct remote execution path. Critical. Escalate NOW.'},
+    ],
+    quickDecision:[
+      {rule:'Action = deny/drop/reset',          action:'Close immediately', cls:'td-close'},
+      {rule:'External → Internal allowed',       action:'Escalate immediately', cls:'td-esc'},
+      {rule:'Internal → Internal + unknown host',action:'Suspicious — Investigate', cls:'td-inv'},
+      {rule:'PowerShell involved',               action:'High risk — Investigate', cls:'td-inv'},
+      {rule:'Known admin / SCCM activity',       action:'Validate & close', cls:'td-close'},
+    ]
+  },
+
+  /* ===== 7. PASSWORD BRUTEFORCE DETECTED ===== */
+  {
+    id:'pwd-bruteforce', severity:'high', cat:'auth',
+    title:'Password Brute Force Detected',
+    subtitle:'Authentication Attack SOP',
+    tags:['Auth','Brute Force','Event ID 4625','SIEM','Account'],
+    dataPoints:[
+      {field:'Source IP',         extract:'src.ipv4',         why:'Internal or external attacker?'},
+      {field:'Target Username',   extract:'target.usr.name',  why:'Which account is targeted?'},
+      {field:'Event ID',          extract:'4625 (failed)',     why:'Windows failed login event'},
+      {field:'Logon Type',        extract:'2 / 3 / 10',       why:'Local / Network (SMB) / RDP'},
+      {field:'Failure Code',      extract:'0xC000006A etc.',  why:'Wrong password vs user not found'},
+      {field:'Frequency',         extract:'event.count',      why:'How many failed attempts?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the alert — multiple Event ID 4625 (failed logins) from same IP?', tool:'SIEM', outcome:'Brute force pattern confirmed', type:'action'},
+      {id:'s2', action:'Is the source IP Internal or External?', tool:'SIEM', outcome:'Internal or external path chosen', type:'decision'},
+      {id:'s3', action:'⭐ CRITICAL CHECK: Did any login succeed? (Check Event ID 4624)', tool:'SIEM Auth Logs', outcome:'Successful login → Escalate IMMEDIATELY. No success → Continue.', type:'decision'},
+      {id:'s4', action:'Check logon type — Type 2 (local), Type 3 (network/SMB), Type 10 (RDP)', tool:'Windows Event Logs', outcome:'Attack vector identified', type:'action'},
+      {id:'s5', action:'Check failure code — 0xC000006A (wrong password), 0xC0000064 (user does not exist)', tool:'SIEM / Event Logs', outcome:'Attack type clarified', type:'action'},
+      {id:'s6', action:'EXTERNAL IP: Check IP reputation and geo-location. Is it allowed through firewall?', tool:'AbuseIPDB, Firewall Logs', outcome:'Threat level assessed', type:'action'},
+      {id:'s7', action:'INTERNAL IP: Check if the source endpoint has unusual processes or scripts running', tool:'EDR / XDR', outcome:'Compromised host or user mistake', type:'decision'},
+      {id:'s8', action:'Is the same IP attacking multiple users? → Password spray attack', tool:'SIEM', outcome:'Spray vs targeted brute force', type:'action'},
+      {id:'s9', action:'Take action: Block source IP / Reset account / Escalate / Close', tool:'Firewall / AD / SOC', outcome:'Appropriate action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',    name:'Cylerian SIEM', desc:'Auth log correlation'},
+      {cat:'OSINT',   name:'AbuseIPDB',    desc:'Attacker IP reputation'},
+      {cat:'OSINT',   name:'GreyNoise',    desc:'Mass scanner check'},
+      {cat:'Firewall',name:'Jithu (FW)',   desc:'IP block'},
+      {cat:'IAM',     name:'AD / IAM',     desc:'Account lockout & reset'},
+    ],
+    escalation:[
+      {trigger:'Login succeeded after brute force', action:'Escalate to IR immediately — account compromised'},
+      {trigger:'Admin / privileged account targeted',action:'Escalate to SOC Lead + notify client'},
+      {trigger:'Same IP hitting multiple users',     action:'Password spray — Block + Escalate'},
+      {trigger:'RDP (Type 10) brute force',          action:'Critical — immediate response'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Internal IP + few attempts → User typo. Validate with user. Close as benign.'},
+      {type:'ok',     text:'External IP + firewall denied → Firewall blocked it. Close.'},
+      {type:'warn',   text:'Same IP targeting multiple users → Password spray. Block and escalate.'},
+      {type:'danger', text:'4624 (success) after 4625 (failures) → Account compromised. Escalate immediately.'},
+    ],
+    quickDecision:[
+      {rule:'Internal + few attempts',          action:'User mistake — Close', cls:'td-close'},
+      {rule:'External + firewall denied',       action:'Firewall blocked — Close', cls:'td-close'},
+      {rule:'External + allowed service exposed',action:'Critical — Escalate', cls:'td-esc'},
+      {rule:'Multiple users targeted',          action:'Spray attack — Block + Escalate', cls:'td-esc'},
+      {rule:'Successful login after failures',  action:'Compromised — Immediate action', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 8. ANOMALOUS DNS REQUEST BY POWERSHELL ===== */
+  {
+    id:'dns-powershell', severity:'high', cat:'endpoint',
+    title:'Anomalous DNS Request by PowerShell',
+    subtitle:'Living-off-the-Land Attack SOP',
+    tags:['PowerShell','DNS','LOLBins','C2','SIEM','EDR'],
+    dataPoints:[
+      {field:'Process Name',    extract:'powershell.exe',     why:'Living-off-the-land tool — high attention'},
+      {field:'DNS Query',       extract:'queried domain name', why:'Check domain reputation and purpose'},
+      {field:'Parent Process',  extract:'process.parent',     why:'User-initiated or scripted?'},
+      {field:'Command Line',    extract:'powershell arguments',why:'Encoded/hidden commands?'},
+      {field:'File Hash',       extract:'file.hash.sha256',   why:'Is the binary legitimate?'},
+      {field:'User Context',    extract:'usr.name',           why:'Who triggered this?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the alert — PowerShell made a DNS query. What domain was queried?', tool:'SIEM / EDR', outcome:'Domain and process confirmed', type:'action'},
+      {id:'s2', action:'Check the queried domain reputation — run on VirusTotal, WHOIS, URLScan', tool:'VirusTotal, WHOIS, URLScan', outcome:'Malicious / suspicious / clean domain', type:'action'},
+      {id:'s3', action:'Is this a known tool domain? (e.g., activated.win = Windows activation tool = policy violation)', tool:'OSINT', outcome:'Purpose of domain identified', type:'decision'},
+      {id:'s4', action:'Analyze the PowerShell command line — any encoded (-EncodedCommand), bypass flags, or hidden commands?', tool:'EDR / XDR', outcome:'Obfuscation detected or clean command', type:'decision'},
+      {id:'s5', action:'Check parent process — was PowerShell launched by a script, task scheduler, or user?', tool:'Process Tree', outcome:'Execution chain mapped', type:'action'},
+      {id:'s6', action:'Check for repeated DNS queries to the same domain (beaconing pattern)', tool:'SIEM / DNS Logs', outcome:'Single event vs beaconing', type:'action'},
+      {id:'s7', action:'Check for external HTTP/S communication after DNS query (C2 callback)', tool:'SIEM / Firewall', outcome:'C2 activity confirmed or ruled out', type:'decision'},
+      {id:'s8', action:'Check for persistence — any new scheduled tasks or registry run keys?', tool:'EDR / Autoruns', outcome:'Backdoor activity confirmed or cleared', type:'action'},
+      {id:'s9', action:'Classify and act: Close / Inform client (policy violation) / Escalate (malicious)', tool:'SOC', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'OSINT',   name:'VirusTotal',    desc:'Domain/hash reputation'},
+      {cat:'OSINT',   name:'ANY.RUN',       desc:'Sandbox behavioral analysis'},
+      {cat:'OSINT',   name:'WHOIS',         desc:'Domain registration details'},
+      {cat:'OSINT',   name:'URLScan.io',    desc:'Web content preview'},
+      {cat:'OSINT',   name:'AbuseIPDB',     desc:'IP reputation'},
+      {cat:'XDR',     name:'K7 InfiniShield',desc:'Process tree & commands'},
+    ],
+    escalation:[
+      {trigger:'Malicious domain confirmed',          action:'Escalate — Active threat'},
+      {trigger:'PowerShell with encoded commands',    action:'Obfuscation — Escalate to L2'},
+      {trigger:'Persistence detected (task/service)', action:'Backdoor — Escalate immediately'},
+      {trigger:'Repeated DNS queries (beaconing)',    action:'C2 suspected — Contain endpoint'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Known admin script + trusted domain → Expected behavior. Close.'},
+      {type:'warn',   text:'Windows activation tool (e.g., activated.win) → Policy violation. Inform client. Close.'},
+      {type:'warn',   text:'Single DNS event, no follow-up traffic → Monitor. Low risk.'},
+      {type:'danger', text:'Encoded PowerShell + external callback → Possible C2. Isolate and escalate.'},
+    ],
+    quickDecision:[
+      {rule:'Trusted domain + expected usage',       action:'Close', cls:'td-close'},
+      {rule:'Policy violation (activation tool)',    action:'Inform client', cls:'td-inv'},
+      {rule:'Unknown domain + PowerShell',          action:'Investigate deeply', cls:'td-inv'},
+      {rule:'Malicious reputation confirmed',        action:'Escalate', cls:'td-esc'},
+      {rule:'Repeated DNS queries (beaconing)',       action:'Contain + Escalate', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 9. ANOMALOUS NETWORK REQUEST BY POWERSHELL ===== */
+  {
+    id:'net-powershell', severity:'high', cat:'endpoint',
+    title:'Anomalous Network Request by PowerShell',
+    subtitle:'PowerShell Outbound Connection SOP',
+    tags:['PowerShell','Network','LOLBins','C2','SIEM','EDR'],
+    dataPoints:[
+      {field:'Process Name',    extract:'powershell.exe',     why:'Living-off-the-land tool'},
+      {field:'Destination IP',  extract:'dst.ipv4',           why:'External communication target'},
+      {field:'Destination Port',extract:'dst.port',           why:'Port 587 = SMTP? Unusual port = suspicious?'},
+      {field:'Command Line',    extract:'powershell arguments',why:'ExecutionPolicy Bypass? Encoded commands?'},
+      {field:'Parent Process',  extract:'process.parent',     why:'Scheduled task or user?'},
+      {field:'Script Source',   extract:'file.path / UNC path',why:'Is the script from a trusted internal share?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm alert — PowerShell made an outbound network connection. To what IP and port?', tool:'SIEM / EDR', outcome:'Destination and port confirmed', type:'action'},
+      {id:'s2', action:'Check destination IP reputation on AbuseIPDB, VirusTotal, WHOIS', tool:'AbuseIPDB, VirusTotal, WHOIS', outcome:'Malicious / clean IP', type:'action'},
+      {id:'s3', action:'Validate the port — Port 587 (SMTP), 443 (HTTPS), or unusual high port?', tool:'Port reference', outcome:'Expected or suspicious port', type:'action'},
+      {id:'s4', action:'Verify the powershell.exe binary hash — is it a legitimate Microsoft binary?', tool:'VirusTotal', outcome:'Legitimate or trojanized binary', type:'action'},
+      {id:'s5', action:'Analyze command-line arguments — any -ExecutionPolicy Bypass, encoded commands, or hidden flags?', tool:'EDR / XDR', outcome:'Defense evasion detected or clean', type:'decision'},
+      {id:'s6', action:'Check parent process — launched by svchost (scheduled task) or by user?', tool:'Process Tree', outcome:'Automated vs user-initiated', type:'action'},
+      {id:'s7', action:'If script-based — validate the script source path (internal share = check trust)', tool:'EDR / File server', outcome:'Trusted or suspicious script', type:'decision'},
+      {id:'s8', action:'Check frequency — is it a single connection or repeated beaconing pattern?', tool:'SIEM / Network logs', outcome:'Isolated vs ongoing C2', type:'action'},
+      {id:'s9', action:'Classify: Benign IT automation / Suspicious / Malicious → Take action', tool:'SOC', outcome:'Alert closed or escalated', type:'close'},
+    ],
+    tools:[
+      {cat:'OSINT',   name:'AbuseIPDB',    desc:'IP reputation'},
+      {cat:'OSINT',   name:'VirusTotal',   desc:'File & IP reputation'},
+      {cat:'OSINT',   name:'ANY.RUN',      desc:'Behavioral sandbox'},
+      {cat:'OSINT',   name:'Shodan',       desc:'Target IP exposure'},
+      {cat:'OSINT',   name:'GreyNoise',    desc:'Mass scanner check'},
+      {cat:'XDR',     name:'K7 InfiniShield',desc:'Process commands'},
+    ],
+    escalation:[
+      {trigger:'Unknown external IP + PowerShell',   action:'Block + Escalate to L2'},
+      {trigger:'ExecutionPolicy Bypass detected',    action:'Defense evasion — Escalate'},
+      {trigger:'Encoded / obfuscated commands',      action:'Malware behavior — Escalate'},
+      {trigger:'Repeated outbound connections',      action:'Beaconing — Isolate host'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Internal script approved by IT/Security + trusted IP → Validate and close.'},
+      {type:'warn',   text:'Trusted IP but unusual port usage → Possible misconfiguration. Validate business need.'},
+      {type:'warn',   text:'SYSTEM account initiating external traffic → High privilege misuse. Escalate for review.'},
+      {type:'danger', text:'Encoded or obfuscated command + external callback → Malware behavior. Contain immediately.'},
+    ],
+    quickDecision:[
+      {rule:'Internal approved tool + trusted IP', action:'Document & close', cls:'td-close'},
+      {rule:'Unknown external IP',                action:'Block & Escalate', cls:'td-esc'},
+      {rule:'ExecutionPolicy Bypass flag',        action:'Investigate deeply', cls:'td-inv'},
+      {rule:'Encoded command',                    action:'Critical — Contain', cls:'td-esc'},
+      {rule:'Repeated beaconing connections',     action:'Isolate host', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 10. ANOMALOUS BRUTEFORCE ===== */
+  {
+    id:'anomalous-bruteforce', severity:'high', cat:'auth',
+    title:'Anomalous Bruteforce',
+    subtitle:'Advanced Authentication Attack SOP',
+    tags:['Bruteforce','4625','4624','NTLM','Kerberos','Lateral Movement'],
+    dataPoints:[
+      {field:'Source IP',           extract:'src.ipv4',        why:'Internal vs external attacker'},
+      {field:'Target Username',     extract:'target.usr.name', why:'Which account is targeted?'},
+      {field:'Event ID',            extract:'4625 / 4724',     why:'Failed login or lockout'},
+      {field:'Logon Type',          extract:'2 / 3 / 10',      why:'Local / SMB / RDP'},
+      {field:'Failure Code',        extract:'0xC000006A etc.', why:'Attack type'},
+      {field:'Auth Package',        extract:'NTLM / Kerberos', why:'Helps detect attack method'},
+      {field:'Success Event',       extract:'Event ID 4624',   why:'Was the attack successful?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm repeated Event ID 4625 (failed logins) — establish the pattern', tool:'SIEM / XDR', outcome:'Brute force pattern confirmed', type:'action'},
+      {id:'s2', action:'Identify source IP type — Internal (10.x.x.x) or External (public IP)?', tool:'SIEM', outcome:'Investigation path determined', type:'decision'},
+      {id:'s3', action:'⭐ CRITICAL: Did any login succeed? Check for Event ID 4624 after the failures', tool:'SIEM Auth Logs', outcome:'Compromise confirmed or ruled out', type:'decision'},
+      {id:'s4', action:'Check failure reason codes — 0xC000006A (bad password), 0xC0000064 (user not exist), 0xC0000234 (locked)', tool:'Event Logs', outcome:'Attack type understood', type:'action'},
+      {id:'s5', action:'Check logon type — Type 10 (RDP) = Critical, Type 3 (Network) = Lateral movement risk', tool:'Event Logs', outcome:'Attack vector identified', type:'action'},
+      {id:'s6', action:'Is the same IP targeting multiple different users? → Password spray attack', tool:'SIEM correlation', outcome:'Spray vs targeted brute force', type:'action'},
+      {id:'s7', action:'Check account in XDR/AD — active user, disabled, or service account?', tool:'XDR / AD', outcome:'Account context understood', type:'action'},
+      {id:'s8', action:'EXTERNAL IP: Enrich with AbuseIPDB and geo-location. Check firewall status.', tool:'AbuseIPDB, Firewall Logs', outcome:'Threat enriched', type:'action'},
+      {id:'s9', action:'Take action based on scenario: Close / Block IP / Isolate host / Reset password / Escalate', tool:'SOC / AD / Firewall', outcome:'Appropriate action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',    name:'Cylerian SIEM', desc:'Auth log correlation'},
+      {cat:'OSINT',   name:'AbuseIPDB',    desc:'External IP reputation'},
+      {cat:'XDR',     name:'Cylerian XDR', desc:'Endpoint telemetry'},
+      {cat:'IAM',     name:'AD / IAM',     desc:'Account status check'},
+      {cat:'Firewall',name:'Jithu (FW)',   desc:'Block attacker IP'},
+    ],
+    escalation:[
+      {trigger:'Successful login (4624 after 4625)', action:'Immediate escalation — account compromised'},
+      {trigger:'Privileged account targeted',        action:'High impact — Escalate to SOC Lead'},
+      {trigger:'Multiple hosts targeted',            action:'Lateral movement — Incident response'},
+      {trigger:'High-volume automated brute force',  action:'Block IP + escalate'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Internal IP + few attempts + valid user → User typo. Close as benign.'},
+      {type:'ok',     text:'External + firewall blocked (denied) → No risk. Close.'},
+      {type:'warn',   text:'Multiple users from same IP → Password spray. Block + monitor.'},
+      {type:'danger', text:'Event 4624 after 4625 → Account compromised. Immediate escalation required.'},
+    ],
+    quickDecision:[
+      {rule:'No success + internal + valid user',   action:'Close (benign)', cls:'td-close'},
+      {rule:'External + brute force blocked',       action:'Close', cls:'td-close'},
+      {rule:'Multiple users targeted',              action:'Spray — Block + Escalate', cls:'td-esc'},
+      {rule:'Successful login detected (4624)',     action:'Compromised — Immediate action', cls:'td-esc'},
+      {rule:'Privileged account targeted',          action:'Escalate', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 11. ANOMALOUS NETWORK CONNECTION ===== */
+  {
+    id:'anomalous-net', severity:'high', cat:'network',
+    title:'Anomalous Network Connection',
+    subtitle:'Suspicious Outbound / Inbound Traffic SOP',
+    tags:['SIEM','XDR','VirusTotal','Process','C2','LOLBins'],
+    dataPoints:[
+      {field:'Source IP',        extract:'src.ipv4',           why:'Identify the internal host'},
+      {field:'Destination IP',   extract:'dst.ipv4',           why:'Identify external communication target'},
+      {field:'Destination Port', extract:'dst.port',           why:'Identify service / protocol'},
+      {field:'Process Name',     extract:'process.name',       why:'What application initiated this?'},
+      {field:'Process Path',     extract:'process.executable', why:'Is the file location legitimate?'},
+      {field:'Process Hash',     extract:'md5 / sha256',       why:'Reputation check'},
+      {field:'User Context',     extract:'usr.name',           why:'SYSTEM or user?'},
+      {field:'Network Direction',extract:'outbound/inbound',   why:'Exfil vs intrusion direction'},
+    ],
+    steps:[
+      {id:'s1', action:'Validate the alert — confirm there is a real network connection event', tool:'SIEM / XDR', outcome:'Connection event confirmed', type:'action'},
+      {id:'s2', action:'Check destination IP reputation on AbuseIPDB', tool:'AbuseIPDB', outcome:'Malicious / clean', type:'action'},
+      {id:'s3', action:'Perform WHOIS and geo-location lookup on destination IP', tool:'WHOIS / IP Lookup', outcome:'Ownership and location identified', type:'action'},
+      {id:'s4', action:'Analyze the process that made the connection — is it legitimate?', tool:'EDR / XDR', outcome:'Legit vs suspicious process', type:'decision'},
+      {id:'s5', action:'Verify the process file path — is it in an expected location?', tool:'Endpoint', outcome:'Expected or suspicious path (Temp/AppData = bad)', type:'action'},
+      {id:'s6', action:'Check the process hash on VirusTotal', tool:'VirusTotal', outcome:'Malicious or clean', type:'action'},
+      {id:'s7', action:'Search SIEM for repeated connections to the same destination', tool:'SIEM', outcome:'Isolated vs repeated / beaconing', type:'action'},
+      {id:'s8', action:'Examine the parent process — what launched this connection?', tool:'Process Tree', outcome:'Execution chain mapped', type:'action'},
+      {id:'s9', action:'Is the port suspicious? 445 (SMB), 3389 (RDP), 22 (SSH), random high ports?', tool:'Port reference', outcome:'Risk level for port identified', type:'decision'},
+      {id:'s10',action:'Validate with application owner — is this traffic expected or authorized?', tool:'Application Owner', outcome:'Legitimate or unauthorized traffic', type:'decision'},
+      {id:'s11',action:'Decision: Close / Block IP / Isolate host / Escalate', tool:'SOC / Firewall', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',  name:'Cylerian SIEM',  desc:'Alert search & correlation'},
+      {cat:'XDR',   name:'K7InfiniShield', desc:'Process & endpoint'},
+      {cat:'OSINT', name:'AbuseIPDB',      desc:'IP reputation check'},
+      {cat:'OSINT', name:'VirusTotal',     desc:'Hash reputation'},
+      {cat:'OSINT', name:'AnyRun',         desc:'Behavioral sandbox'},
+    ],
+    escalation:[
+      {trigger:'Malicious IP confirmed',        action:'Block IP + Escalate to L2'},
+      {trigger:'Suspicious process (Temp/AppData)', action:'Isolate endpoint'},
+      {trigger:'Data exfiltration suspected',   action:'Escalate to Incident Response'},
+      {trigger:'Lateral movement detected',     action:'Critical — Contain immediately'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Known backup or monitoring tool → Verify with app owner and close.'},
+      {type:'ok',     text:'Scheduled task-based traffic → Validate task legitimacy and close.'},
+      {type:'warn',   text:'Process from Temp or AppData → Suspicious location. Investigate.'},
+      {type:'danger', text:'Multiple hosts connecting to same malicious IP → Active infection. Incident response.'},
+    ],
+    quickDecision:[
+      {rule:'Verified business application',    action:'Close', cls:'td-close'},
+      {rule:'Malicious IP + any process',       action:'Block IP + Escalate', cls:'td-esc'},
+      {rule:'Suspicious process path',          action:'Isolate host', cls:'td-esc'},
+      {rule:'Multiple hosts to same IP',        action:'Incident Response', cls:'td-esc'},
+      {rule:'No malicious indicators',          action:'Close', cls:'td-close'},
+    ]
+  },
+
+  /* ===== 12. FIRST SEEN TUNNEL-UP ACTION ===== */
+  {
+    id:'tunnel-up', severity:'medium', cat:'auth',
+    title:'First Seen Tunnel-Up Action',
+    subtitle:'VPN / Anomalous Login SOP',
+    tags:['VPN','SSL','Tunnel','Geo-anomaly','First Seen','FortiGate'],
+    dataPoints:[
+      {field:'Remote IP',       extract:'remip / src.ipv4',    why:'External origin of connection'},
+      {field:'Username',        extract:'user',                why:'Target account'},
+      {field:'VPN Type',        extract:'ssl-tunnel',          why:'Access method'},
+      {field:'Tunnel IP',       extract:'tunnelip',            why:'Internal IP assigned'},
+      {field:'Geo Location',    extract:'country/city',        why:'Anomaly detection — unexpected location?'},
+      {field:'ISP / Org',       extract:'ISP name',            why:'Residential ISP vs datacenter/VPN?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the alert — first-time tunnel-up/VPN login for this user', tool:'SIEM / VPN Logs', outcome:'First-time login confirmed', type:'action'},
+      {id:'s2', action:'Check if the user is valid — look them up in XDR or Active Directory', tool:'XDR / AD', outcome:'Valid or unknown account', type:'action'},
+      {id:'s3', action:'Check historical VPN/login IPs for this user — is this location new?', tool:'SIEM / Firewall logs', outcome:'Baseline deviation confirmed or normal', type:'action'},
+      {id:'s4', action:'Identify the IP type — is the ISP a residential telecom (Airtel/Jio/Etisalat) or a datacenter (AWS/Azure/DigitalOcean)?', tool:'WHOIS / ipinfo.io / BGP lookup', outcome:'Real user vs VPN/proxy', type:'decision'},
+      {id:'s5', action:'Check IP reputation on AbuseIPDB and VirusTotal', tool:'AbuseIPDB, VirusTotal', outcome:'Known malicious or clean', type:'action'},
+      {id:'s6', action:'Check for impossible travel — was there a login from another country recently?', tool:'SIEM / Login history', outcome:'Impossible travel confirmed or cleared', type:'decision'},
+      {id:'s7', action:'Check if multiple users logged in from the same IP (shared VPN?)', tool:'SIEM', outcome:'Shared VPN or shared account suspected', type:'action'},
+      {id:'s8', action:'Check post-login activity — any lateral movement, file access, or new processes?', tool:'EDR / SIEM', outcome:'Post-login behavior analyzed', type:'action'},
+      {id:'s9', action:'If suspicious — confirm with user (travel, remote work?). Close or escalate.', tool:'Client / User', outcome:'User confirms or denies → Close/Escalate', type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',    name:'Cylerian SIEM',  desc:'Login correlation'},
+      {cat:'VPN',     name:'FortiGate',      desc:'VPN logs & tunnel data'},
+      {cat:'OSINT',   name:'AbuseIPDB',      desc:'IP reputation'},
+      {cat:'OSINT',   name:'ipinfo.io',      desc:'ISP/ASN lookup'},
+      {cat:'OSINT',   name:'BGP.he.net',     desc:'ASN lookup — cloud/datacenter?'},
+    ],
+    escalation:[
+      {trigger:'Impossible travel detected',         action:'Escalate — potential account compromise'},
+      {trigger:'AbuseIPDB flagged IP',               action:'Block IP + Escalate'},
+      {trigger:'Datacenter/VPN IP + unusual timing', action:'Verify with user. Escalate if no confirmation.'},
+      {trigger:'Suspicious post-login activity',     action:'Critical — Incident response'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'ISP = residential telecom (Airtel/Etisalat/Jio) → Likely real user. Confirm if first-time location.'},
+      {type:'warn',   text:'ISP = AWS/Azure/DigitalOcean → Likely VPN usage. Verify with user.'},
+      {type:'warn',   text:'No AbuseIPDB hit ≠ safe. Must also check ISP, ASN, geo pattern, and user history.'},
+      {type:'danger', text:'Previous login India → Current login UAE (short time gap) → Impossible travel. Escalate immediately.'},
+    ],
+    quickDecision:[
+      {rule:'User confirms + residential ISP',       action:'Close', cls:'td-close'},
+      {rule:'No activity after VPN login',           action:'Close', cls:'td-close'},
+      {rule:'Datacenter IP + no user confirmation',  action:'Investigate', cls:'td-inv'},
+      {rule:'Impossible travel detected',            action:'Escalate', cls:'td-esc'},
+      {rule:'AbuseIPDB flagged + multiple failures', action:'Block + Escalate', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 13. REMOTE FILE EXECUTED ===== */
+  {
+    id:'remote-file', severity:'high', cat:'endpoint',
+    title:'Remote File Executed',
+    subtitle:'Suspicious File Execution SOP',
+    tags:['File Execution','EDR','Hash','Sandbox','LOLBins','Phishing'],
+    dataPoints:[
+      {field:'File Path',       extract:'file.path',        why:'Downloads/Temp/AppData = high risk'},
+      {field:'File Type',       extract:'file.extension',   why:'Validate real type vs extension'},
+      {field:'Process',         extract:'process.name',     why:'What application executed the file?'},
+      {field:'Parent Process',  extract:'process.parent',   why:'Explorer, browser, or script?'},
+      {field:'User Account',    extract:'usr.name',         why:'Valid user? Expected?'},
+      {field:'File Hash',       extract:'file.hash.sha256', why:'Reputation check'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the alert — what file was executed? Where is it located?', tool:'SIEM / EDR', outcome:'File path and details captured', type:'action'},
+      {id:'s2', action:'Check file path — is it in Downloads, Temp, AppData, or %APPDATA%? (High risk locations)', tool:'EDR', outcome:'Suspicious or expected location', type:'decision'},
+      {id:'s3', action:'Validate real file type vs extension — is it masquerading? (e.g., .jpg.exe)', tool:'PEStudio / EDR', outcome:'Real file type confirmed', type:'action'},
+      {id:'s4', action:'Look up the file hash on VirusTotal and Hybrid Analysis', tool:'VirusTotal, Hybrid Analysis', outcome:'Malicious / clean hash', type:'action'},
+      {id:'s5', action:'Analyze parent-child process relationship — what launched this file?', tool:'Process Tree / EDR', outcome:'Execution chain mapped', type:'action'},
+      {id:'s6', action:'Identify entry vector — was this from web download, email attachment, USB, or network share?', tool:'Browser logs, Mail logs, EDR', outcome:'Source identified', type:'action'},
+      {id:'s7', action:'If suspicious or unknown — submit to sandbox (ANY.RUN)', tool:'ANY.RUN', outcome:'Behavioral analysis complete', type:'action'},
+      {id:'s8', action:'Check for persistence — any new scheduled tasks, registry run keys, or startup entries?', tool:'Autoruns / EDR', outcome:'Persistence confirmed or cleared', type:'action'},
+      {id:'s9', action:'Check if same file hash exists on other endpoints', tool:'SIEM / XDR', outcome:'Isolated vs spread', type:'action'},
+      {id:'s10',action:'Decision: Close / Monitor / Isolate endpoint / Escalate', tool:'SOC', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'OSINT',   name:'VirusTotal',     desc:'File hash reputation'},
+      {cat:'Sandbox', name:'ANY.RUN',         desc:'Behavioral sandbox'},
+      {cat:'Sandbox', name:'Hybrid Analysis', desc:'Deep file analysis'},
+      {cat:'Analysis',name:'PEStudio',        desc:'File metadata & strings'},
+      {cat:'XDR',     name:'K7 InfiniShield', desc:'Process tree & file events'},
+    ],
+    escalation:[
+      {trigger:'File detected as malware',            action:'Isolate endpoint + Escalate to Malware Lab'},
+      {trigger:'Script execution (PowerShell/CMD)',   action:'High risk — Escalate to L2'},
+      {trigger:'Multiple endpoints with same hash',   action:'Active spread — Incident response'},
+      {trigger:'Persistence or lateral movement',     action:'Full IR engagement'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Known software update file → Verify hash and close.'},
+      {type:'ok',     text:'Internal file share execution → Validate trust of share source.'},
+      {type:'warn',   text:'File from Downloads or Temp → High-risk location. Investigate.'},
+      {type:'danger', text:'Double extension (photo.jpg.exe) + unknown hash → Masquerading malware. Escalate.'},
+    ],
+    quickDecision:[
+      {rule:'Known safe file + expected location', action:'Close', cls:'td-close'},
+      {rule:'Unknown file + suspicious location',  action:'Sandbox + Escalate', cls:'td-esc'},
+      {rule:'VirusTotal hits',                     action:'Containment required', cls:'td-esc'},
+      {rule:'Multiple hosts affected',             action:'Incident response', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 14. POTENTIAL USE OF 7-ZIP ===== */
+  {
+    id:'7zip', severity:'high', cat:'endpoint',
+    title:'Potential Use of 7-Zip to Encrypt Files',
+    subtitle:'Data Staging / Ransomware-like Activity SOP',
+    tags:['7-Zip','Encryption','Data Staging','EDR','Ransomware'],
+    dataPoints:[
+      {field:'Process Name',    extract:'7z.exe / 7za.exe',  why:'Confirm 7-Zip binary'},
+      {field:'Command Line',    extract:'7z arguments',      why:'Look for -p (password), -mhe (header encrypt), -sdel (delete)'},
+      {field:'File Path',       extract:'process.executable',why:'Program Files = normal. Temp/AppData = suspicious.'},
+      {field:'Target Files',    extract:'files being archived',why:'Sensitive or bulk files targeted?'},
+      {field:'Parent Process',  extract:'process.parent',    why:'Explorer (user) vs script (PowerShell/CMD)'},
+      {field:'User Account',    extract:'usr.name',          why:'Authorized or unauthorized user?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the alert — what is 7-Zip doing? Extract command-line arguments', tool:'EDR / XDR', outcome:'Command and arguments captured', type:'action'},
+      {id:'s2', action:'⭐ Check for critical flags: -p (password), -mhe (encrypt headers), -sdel (delete after archive)', tool:'EDR process args', outcome:'Danger flags identified or none', type:'decision'},
+      {id:'s3', action:'Validate 7z.exe path — is it in Program Files (legitimate) or Temp/AppData (suspicious)?', tool:'EDR', outcome:'Path legitimacy confirmed', type:'action'},
+      {id:'s4', action:'What files are being archived? Check if sensitive or bulk user files are targeted', tool:'EDR / File logs', outcome:'Scope of archiving identified', type:'action'},
+      {id:'s5', action:'Check parent process — was it launched by Explorer (user) or by script (PowerShell/CMD)?', tool:'Process Tree', outcome:'User-initiated vs automated/scripted', type:'decision'},
+      {id:'s6', action:'Check archive output destination — local desktop, temp folder, or network path?', tool:'EDR / File monitor', outcome:'Exfiltration staging identified or local only', type:'action'},
+      {id:'s7', action:'Check network activity after archive — any uploads or data transfers?', tool:'SIEM / Firewall', outcome:'Exfiltration activity confirmed or cleared', type:'action'},
+      {id:'s8', action:'Check same activity across other endpoints in SIEM', tool:'SIEM', outcome:'Isolated or spread', type:'action'},
+      {id:'s9', action:'Decision: Close (normal use) / Monitor (password only) / Isolate (bulk + -mhe/-sdel)', tool:'SOC', outcome:'Action taken', type:'close'},
+    ],
+    tools:[
+      {cat:'XDR',     name:'K7 InfiniShield', desc:'Process tree & command args'},
+      {cat:'OSINT',   name:'VirusTotal',       desc:'7z.exe hash check'},
+      {cat:'SIEM',    name:'Cylerian SIEM',    desc:'Spread correlation'},
+      {cat:'Network', name:'Firewall / Proxy', desc:'Upload detection'},
+    ],
+    escalation:[
+      {trigger:'Use of -mhe (header encryption)',   action:'Concealment — Escalate immediately'},
+      {trigger:'Use of -sdel (delete after archive)',action:'Critical — Data destruction risk'},
+      {trigger:'Bulk sensitive files targeted',      action:'Escalate — Data staging/exfil risk'},
+      {trigger:'Multiple endpoints affected',        action:'Active incident — Declare and respond'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'IT backup scripts using 7z without password → Legitimate. Validate and close.'},
+      {type:'ok',     text:'User manually compressing files → Normal behavior. Confirm with user.'},
+      {type:'warn',   text:'Password protection alone (-p flag) → Medium risk. Confirm business use.'},
+      {type:'danger', text:'-mhe + -sdel + bulk files in Temp/network path → Data staging. Escalate immediately.'},
+    ],
+    quickDecision:[
+      {rule:'Standard compression, no password',     action:'Close', cls:'td-close'},
+      {rule:'Password-protected (known use)',         action:'Confirm & close', cls:'td-close'},
+      {rule:'-mhe flag (header encryption)',          action:'Escalate', cls:'td-esc'},
+      {rule:'-sdel flag (delete after)',             action:'Critical', cls:'td-esc'},
+      {rule:'Bulk files + script-launched',          action:'Escalate immediately', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 15. MALWARE DETECTION (existing) ===== */
+  {
+    id:'malware', severity:'critical', cat:'malware',
+    title:'Malware Detection',
+    subtitle:'Endpoint Response Procedure',
+    tags:['XDR','Sandbox','Hash','Quarantine','K7'],
+    dataPoints:[
+      {field:'File Hash (MD5/SHA256)', extract:'file.hash.sha256', why:'Reputation & signature check'},
+      {field:'File Path',              extract:'file.path',        why:'Is it in a legitimate location?'},
+      {field:'Parent Process',         extract:'process.parent',   why:'Execution chain context'},
+      {field:'Endpoint Hostname',      extract:'host.name',        why:'Which machine is affected?'},
+      {field:'User Account',           extract:'usr.name',         why:'Scope of compromise'},
+      {field:'Detection Time',         extract:'meta.created',     why:'Timeline for containment'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the malware alert in XDR — is it a real detection?',         tool:'K7InfiniShield',        outcome:'Alert validated, not a false positive',   type:'action'},
+      {id:'s2', action:'If CRITICAL severity — isolate the endpoint from the network NOW',    tool:'K7InfiniShield',        outcome:'Endpoint isolated to stop spread',         type:'escalate'},
+      {id:'s3', action:'Collect the file hash (SHA256) and file path',                       tool:'K7InfiniShield / SIEM', outcome:'Hash and file details extracted',          type:'action'},
+      {id:'s4', action:'Submit hash to VirusTotal and ANY.RUN',                              tool:'VirusTotal, ANY.RUN',   outcome:'Malicious / benign determination',         type:'action'},
+      {id:'s5', action:'Check for lateral movement — did it spread to other machines?',      tool:'SIEM / XDR',            outcome:'Other affected endpoints identified',       type:'action'},
+      {id:'s6', action:'Look for persistence — registry, startup entries, scheduled tasks',   tool:'K7InfiniShield',        outcome:'Persistence mechanism found or cleared',   type:'action'},
+      {id:'s7', action:'Quarantine or delete the malware file',                              tool:'K7InfiniShield',        outcome:'File removed from the system',             type:'escalate'},
+      {id:'s8', action:'Patch the vulnerability that was exploited',                         tool:'Patch Management',      outcome:'Vulnerability closed',                    type:'action'},
+      {id:'s9', action:'Document everything and close the incident',                         tool:'Cylerian SIEM',         outcome:'Full IR report filed',                    type:'close'},
+    ],
+    tools:[
+      {cat:'XDR',      name:'K7InfiniShield',  desc:'Endpoint detection & response'},
+      {cat:'Sandbox',  name:'ANY.RUN',          desc:'Dynamic malware analysis'},
+      {cat:'OSINT',    name:'VirusTotal',       desc:'Hash & file reputation'},
+      {cat:'SIEM',     name:'Cylerian SIEM',    desc:'Correlation & timeline'},
+      {cat:'Analysis', name:'Hybrid Analysis',  desc:'Deep file sandbox'},
+    ],
+    escalation:[
+      {trigger:'Confirmed ransomware',         action:'Escalate to IR Lead immediately'},
+      {trigger:'Lateral movement detected',    action:'Escalate to Senior Analyst + IR'},
+      {trigger:'Persistence confirmed',        action:'Full IR engagement required'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'PUP or Adware only → Quarantine. No full escalation required.'},
+      {type:'warn',   text:'Multiple endpoints with same hash → Coordinated attack. Escalate.'},
+      {type:'danger', text:'Ransomware encrypting files → Isolate all affected endpoints immediately.'},
+    ],
+    quickDecision:[
+      {rule:'PUP / Adware only',             action:'Quarantine & close', cls:'td-close'},
+      {rule:'Confirmed malware',             action:'Isolate + Escalate', cls:'td-esc'},
+      {rule:'Multiple endpoints same hash',  action:'Coordinated attack — IR', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 16. PHISHING (existing) ===== */
+  {
+    id:'phishing', severity:'high', cat:'email',
+    title:'Phishing Alert',
+    subtitle:'Email Triage & Response',
+    tags:['Email','URL','Sandbox','Attachment','SPF','DMARC'],
+    dataPoints:[
+      {field:'Sender Address',   extract:'email.from',       why:'Identify spoofed / malicious sender'},
+      {field:'Reply-To Header',  extract:'email.reply_to',   why:'Detect reply-to redirect attacks'},
+      {field:'Subject Line',     extract:'email.subject',    why:'Phishing pattern identification'},
+      {field:'Attachment Hash',  extract:'file.hash.sha256', why:'Malware payload check'},
+      {field:'URLs in Email',    extract:'url.full',         why:'Malicious link detection'},
+      {field:'Recipient',        extract:'email.to',         why:'Targeted vs bulk phishing scope'},
+    ],
+    steps:[
+      {id:'s1', action:'Open the phishing report or alert',                                      tool:'Cylerian SIEM / User Report', outcome:'Phishing incident created',                         type:'action'},
+      {id:'s2', action:'Extract email headers, sender, recipient, subject, and attachments',     tool:'Email Gateway / SIEM',        outcome:'All email metadata captured',                      type:'action'},
+      {id:'s3', action:'Analyze any URLs in the email',                                          tool:'URLScan.io, VirusTotal',      outcome:'Malicious / benign URL determination',              type:'action'},
+      {id:'s4', action:'If there is an attachment — sandbox it',                                 tool:'ANY.RUN, Hybrid Analysis',    outcome:'Payload behaviour analyzed',                        type:'action'},
+      {id:'s5', action:'Did the user click the link or enter credentials?',                      tool:'SIEM / Proxy Logs',           outcome:'Scope of compromise determined',                    type:'decision'},
+      {id:'s6', action:'Block the sender and malicious URL at the email gateway',                tool:'Email Gateway / Firewall',    outcome:'Threat contained',                                  type:'escalate'},
+      {id:'s7', action:'If credentials were entered — reset password and notify the user',       tool:'IT / SOC',                    outcome:'Account secured',                                  type:'escalate'},
+      {id:'s8', action:'Document all findings and close the incident',                           tool:'Cylerian SIEM',               outcome:'Phishing report filed',                             type:'close'},
+    ],
+    tools:[
+      {cat:'OSINT',   name:'URLScan.io',      desc:'URL reputation & screenshot'},
+      {cat:'OSINT',   name:'VirusTotal',      desc:'URL & attachment check'},
+      {cat:'Sandbox', name:'ANY.RUN',          desc:'Attachment sandbox'},
+      {cat:'Sandbox', name:'Hybrid Analysis', desc:'Deep file analysis'},
+      {cat:'DNS',     name:'MXToolbox',       desc:'SPF / DKIM / DMARC check'},
+    ],
+    escalation:[
+      {trigger:'Credentials entered on phishing site', action:'Reset password, notify IT, escalate to IR'},
+      {trigger:'Malicious payload executed',           action:'Escalate to Malware Analysis'},
+      {trigger:'Mass phishing campaign detected',      action:'Escalate to SOC Lead + notify client'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'User did not click the link → Block sender, monitor, no escalation.'},
+      {type:'warn',   text:'Spear phishing targeting an executive → High priority. Notify CISO.'},
+      {type:'danger', text:'Credentials entered on phishing site → Immediate account lockdown.'},
+    ],
+    quickDecision:[
+      {rule:'User did not click / open',          action:'Block sender & close', cls:'td-close'},
+      {rule:'User clicked — no credentials',      action:'Monitor + block', cls:'td-inv'},
+      {rule:'Credentials entered',               action:'Reset + Escalate', cls:'td-esc'},
+      {rule:'Payload executed',                  action:'Full IR', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 17. DATA EXFILTRATION (existing) ===== */
+  {
+    id:'data-exfil', severity:'medium', cat:'network',
+    title:'Data Exfiltration',
+    subtitle:'Detection & Containment',
+    tags:['DLP','SIEM','XDR','Network','Insider Threat'],
+    dataPoints:[
+      {field:'Source Host',          extract:'host.name',        why:'Which machine is sending data?'},
+      {field:'Destination IP/Domain',extract:'dst.ipv4/dns.name',why:'Where is the data going?'},
+      {field:'Data Volume',          extract:'network.bytes',     why:'How much data was transferred?'},
+      {field:'Protocol',             extract:'TCP/HTTP/HTTPS',    why:'Exfiltration method used'},
+      {field:'User Account',         extract:'usr.name',          why:'Insider vs external threat?'},
+      {field:'Process',              extract:'process.name',      why:'What application sent the data?'},
+    ],
+    steps:[
+      {id:'s1', action:'Identify the alert — large or unusual outbound data transfer',    tool:'SIEM / DLP',        outcome:'Exfiltration event opened',                     type:'action'},
+      {id:'s2', action:'Identify the source host and user account',                       tool:'SIEM / XDR',        outcome:'Machine and user identified',                   type:'action'},
+      {id:'s3', action:'Look up the destination IP or domain — is it known / trusted?',  tool:'AbuseIPDB, WHOIS',  outcome:'External destination is malicious, unknown, or trusted', type:'action'},
+      {id:'s4', action:'Review the volume and timing — is this unusual for this machine?',tool:'SIEM',              outcome:'Unusual volume or off-hours activity confirmed', type:'decision'},
+      {id:'s5', action:'Is this transfer authorized? Check with the application owner',   tool:'Application Owner', outcome:'Authorized backup vs unauthorized exfiltration', type:'decision'},
+      {id:'s6', action:'Block the outbound connection if it appears malicious',           tool:'Firewall / XDR',    outcome:'Exfiltration channel blocked',                   type:'escalate'},
+      {id:'s7', action:'Capture and preserve all logs as evidence',                       tool:'SIEM / Endpoint',   outcome:'Evidence secured for forensics',                type:'action'},
+      {id:'s8', action:'Document findings and notify SOC Lead or client',                 tool:'SOC Lead / Client', outcome:'Incident report filed',                         type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',     name:'Cylerian SIEM',    desc:'Transfer volume analysis'},
+      {cat:'XDR',      name:'K7InfiniShield',   desc:'Process & endpoint'},
+      {cat:'OSINT',    name:'AbuseIPDB',        desc:'Destination IP check'},
+      {cat:'OSINT',    name:'Shodan',           desc:'Destination exposure'},
+      {cat:'Firewall', name:'Jithu (FW Team)',  desc:'Block outbound connection'},
+    ],
+    escalation:[
+      {trigger:'Confirmed data exfiltration',     action:'Escalate to IR Lead + Legal'},
+      {trigger:'Insider threat suspected',        action:'Notify HR + CISO'},
+      {trigger:'PII / PCI data leaked',           action:'Compliance / breach notification required'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'Authorized cloud backup process detected → Verify with app owner and close.'},
+      {type:'warn',   text:'Large transfer outside business hours → Investigate user activity.'},
+      {type:'danger', text:'PII / sensitive data confirmed exfiltrated → Regulatory breach notification required.'},
+    ],
+    quickDecision:[
+      {rule:'Authorized backup/sync',         action:'Verify & close', cls:'td-close'},
+      {rule:'Unknown destination + large volume', action:'Investigate', cls:'td-inv'},
+      {rule:'Malicious destination confirmed', action:'Block + Escalate', cls:'td-esc'},
+      {rule:'PII/PCI data involved',          action:'Compliance notification', cls:'td-esc'},
+    ]
+  },
+
+  /* ===== 18. BRUTE FORCE (existing, kept) ===== */
+  {
+    id:'brute-force', severity:'medium', cat:'auth',
+    title:'Brute Force / Credential Attack',
+    subtitle:'Standard Operating Procedure',
+    tags:['Auth','SIEM','Account','MFA','RDP','VPN'],
+    dataPoints:[
+      {field:'Target Account',     extract:'usr.name',    why:'Which account is being attacked?'},
+      {field:'Source IP',          extract:'src.ipv4',    why:'Where is the attack coming from?'},
+      {field:'Failed Login Count', extract:'event.count', why:'How intense is the attack?'},
+      {field:'Geo-location',       extract:'geo.country', why:'Impossible travel detection'},
+      {field:'Auth Method',        extract:'auth.type',   why:'VPN / RDP / Web portal?'},
+      {field:'Timestamp Range',    extract:'meta.created',why:'How long has the attack been going?'},
+    ],
+    steps:[
+      {id:'s1', action:'Confirm the brute force alert — multiple failed logins from same IP?',   tool:'Cylerian SIEM',   outcome:'Attack pattern confirmed',                                        type:'action'},
+      {id:'s2', action:'Extract the source IP and check its geo-location',                       tool:'SIEM / IP Lookup',outcome:'Attacker origin identified',                                       type:'action'},
+      {id:'s3', action:'CRITICAL CHECK: Did any login succeed?',                                 tool:'SIEM Auth Logs',  outcome:'Successful login → Escalate immediately. No success → Continue.', type:'decision'},
+      {id:'s4', action:'Check the source IP reputation',                                         tool:'AbuseIPDB, GreyNoise', outcome:'Known mass scanner vs targeted attack',                      type:'action'},
+      {id:'s5', action:'Block the source IP at the firewall',                                    tool:'Firewall (Jithu)',outcome:'Attacker IP blocked',                                              type:'escalate'},
+      {id:'s6', action:'If any login succeeded — lock the account and force a password reset',   tool:'AD / IAM',        outcome:'Account secured',                                                 type:'escalate'},
+      {id:'s7', action:'Document everything and close the incident',                             tool:'Cylerian SIEM',   outcome:'Incident report filed',                                           type:'close'},
+    ],
+    tools:[
+      {cat:'SIEM',     name:'Cylerian SIEM', desc:'Auth log correlation'},
+      {cat:'OSINT',    name:'AbuseIPDB',     desc:'Attacker IP reputation'},
+      {cat:'OSINT',    name:'GreyNoise',     desc:'Mass scanner identification'},
+      {cat:'Firewall', name:'Jithu (FW)',    desc:'IP block'},
+      {cat:'IAM',      name:'AD / IAM',      desc:'Account lockout & reset'},
+    ],
+    escalation:[
+      {trigger:'Login succeeded after brute force', action:'Escalate to IR immediately — possible compromise'},
+      {trigger:'Admin account targeted',            action:'Escalate to SOC Lead + notify client'},
+      {trigger:'VPN / RDP port exposed',            action:'Firewall review with Jithu'},
+    ],
+    edgeCases:[
+      {type:'ok',     text:'GreyNoise marks source as known mass scanner → Block IP and close as benign.'},
+      {type:'warn',   text:'Logins from 2 different countries → Impossible travel. Investigate.'},
+      {type:'danger', text:'Admin credentials brute-forced successfully → Full IR response required.'},
+    ],
+    quickDecision:[
+      {rule:'External + blocked by firewall',  action:'Close', cls:'td-close'},
+      {rule:'No successful login',             action:'Block IP & monitor', cls:'td-inv'},
+      {rule:'Successful login after failures', action:'Escalate immediately', cls:'td-esc'},
+    ]
+  }
+];
+
+// ── STATE ──
+let checkedSteps = {};
+let currentPB    = null;
+let activeFilter = 'all';
+
+// ── LOGIN ──
+function login() {
+  if (document.getElementById('lp').value === PW) {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('appScreen').style.display = 'block';
+    buildHome();
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+    document.getElementById('lp').value = '';
+  }
+}
+
+// ── HOME ──
+function buildHome() {
+  const grid = document.getElementById('allCards');
+  grid.innerHTML = PLAYBOOKS.map(pb => `
+    <div class="alert-card" data-cat="${pb.cat}" onclick="openSOP('${pb.id}')">
+      <div class="ac-icon ${ICON_CLASS[pb.severity]}">${ICONS[pb.id]||'📋'}</div>
+      <div>
+        <div class="ac-name">${pb.title}</div>
+        <div class="ac-steps">${pb.steps.length} steps · ${pb.subtitle}</div>
+      </div>
+      <span class="ac-sev ${SEV_CLASS[pb.severity]}">${pb.severity.toUpperCase()}</span>
+    </div>
+  `).join('');
+
+  // Search
+  const inp  = document.getElementById('bigSearch');
+  const drop = document.getElementById('searchDrop');
+  inp.addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    if (!q) { drop.style.display='none'; return; }
+    const hits = PLAYBOOKS.filter(pb =>
+      pb.title.toLowerCase().includes(q) ||
+      pb.subtitle.toLowerCase().includes(q) ||
+      pb.tags.some(t => t.toLowerCase().includes(q)) ||
+      pb.steps.some(s => s.action.toLowerCase().includes(q))
+    );
+    if (!hits.length) { drop.style.display='none'; return; }
+    drop.innerHTML = hits.map(pb => `
+      <div class="srd-item" onclick="openSOP('${pb.id}')">
+        <div class="srd-icon ${ICON_CLASS[pb.severity]}">${ICONS[pb.id]||'📋'}</div>
+        <div>
+          <div class="srd-name">${pb.title}</div>
+          <div class="srd-steps">${pb.steps.length} steps · ${pb.subtitle}</div>
+        </div>
+        <span class="srd-sev ${SEV_CLASS[pb.severity]}">${pb.severity.toUpperCase()}</span>
+      </div>
+    `).join('');
+    drop.style.display = 'block';
+  });
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.search-box-wrap')) drop.style.display = 'none';
+  });
+  inp.focus();
+}
+
+function filterCards(cat, el) {
+  activeFilter = cat;
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.querySelectorAll('.alert-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+
+// ── OPEN SOP ──
+function openSOP(id) {
+  currentPB = PLAYBOOKS.find(p => p.id === id);
+  if (!currentPB) return;
+  checkedSteps[id] = checkedSteps[id] || {};
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('sopView').style.display = 'block';
+  document.getElementById('sopTopTitle').textContent = currentPB.title;
+  document.getElementById('sopTopSev').className = 'sop-topbar-sev ' + SEV_CLASS[currentPB.severity];
+  document.getElementById('sopTopSev').textContent = currentPB.severity.toUpperCase();
+  renderSOP();
+  window.scrollTo(0,0);
+}
+
+function renderSOP() {
+  const pb      = currentPB;
+  const checked = checkedSteps[pb.id];
+  const doneCount = Object.values(checked).filter(Boolean).length;
+  const total = pb.steps.length;
+
+  document.getElementById('progressFill').style.width = Math.round(doneCount/total*100)+'%';
+  document.getElementById('progressText').textContent = doneCount + ' / ' + total + ' done';
+
+  let html = '';
+
+  // DATA POINTS
+  html += '<div class="sec-label">📋 Step 1 — Collect these fields from the alert</div>';
+  html += '<div class="dp-grid">';
+  pb.dataPoints.forEach((d,i) => {
+    html += `<div class="dp-row">
+      <div class="dp-num">${i+1}</div>
+      <div class="dp-field">${d.field}</div>
+      <span class="dp-extract">${d.extract}</span>
+      <div class="dp-why">${d.why}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // STEPS
+  html += '<div class="sec-label" style="margin-top:2rem">🔍 Step 2 — Follow the investigation steps</div>';
+  html += '<div class="steps-list">';
+  pb.steps.forEach((s, i) => {
+    const done    = !!checked[s.id];
+    const isLast  = i === pb.steps.length - 1;
+    const isNext  = !done && i === pb.steps.findIndex(x => !checked[x.id]);
+    const badgeLabel = s.type === 'action' ? 'Action' : s.type === 'decision' ? 'Decision' : s.type === 'escalate' ? '⚠ Escalate' : '✓ Close';
+    let outcomeChip = 'chip-outcome';
+    if (s.type === 'escalate') outcomeChip = 'chip-danger';
+    else if (s.type === 'decision') outcomeChip = 'chip-decision';
+
+    html += `
+    <div class="step-row">
+      <div class="step-left">
+        <div class="step-check ${done?'done':''}" onclick="toggleStep('${s.id}')" title="${done?'Mark incomplete':'Mark complete'}">
+          ${done ? '✓' : (i+1)}
+        </div>
+        ${!isLast ? `<div class="step-connector ${done?'done':''}"></div>` : ''}
+      </div>
+      <div class="step-content ${done?'done':''} ${isNext&&!done?'active-step':''}">
+        <div class="step-num-label">Step ${i+1} · <span class="step-type-badge badge-${s.type}">${badgeLabel}</span></div>
+        <div class="step-action">${s.action}</div>
+        <div class="step-meta">
+          <span class="meta-chip chip-tool">🔧 ${s.tool}</span>
+          <span class="meta-chip ${outcomeChip}">→ ${s.outcome}</span>
+        </div>
+      </div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // QUICK DECISION TABLE
+  if (pb.quickDecision && pb.quickDecision.length) {
+    html += '<div class="sec-label" style="margin-top:2rem">⚡ Quick Decision Reference (L1)</div>';
+    html += '<div style="overflow-x:auto;border-radius:10px;border:1px solid #e4e7ed">';
+    html += '<table class="qd-table"><thead><tr><th>Condition / Rule</th><th>Action</th></tr></thead><tbody>';
+    pb.quickDecision.forEach(q => {
+      html += `<tr><td>${q.rule}</td><td class="${q.cls}">${q.action}</td></tr>`;
+    });
+    html += '</tbody></table></div>';
+  }
+
+  // TOOLS
+  html += '<div class="sec-label" style="margin-top:2rem">🛠 Tools Reference</div>';
+  html += '<div class="tools-grid">';
+  pb.tools.forEach(t => {
+    html += `<div class="tool-tile">
+      <div class="tool-cat">${t.cat}</div>
+      <div class="tool-name">${t.name}</div>
+      <div class="tool-desc">${t.desc}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // ESCALATION
+  html += '<div class="sec-label" style="margin-top:2rem">🚨 When to Escalate</div>';
+  html += '<div class="esc-list">';
+  pb.escalation.forEach(e => {
+    html += `<div class="esc-row">
+      <div class="esc-trigger">${e.trigger}</div>
+      <div class="esc-action">→ ${e.action}</div>
+    </div>`;
+  });
+  html += '</div>';
+
+  // EDGE CASES
+  html += '<div class="sec-label" style="margin-top:2rem">💡 Edge Cases & Notes</div>';
+  html += '<div class="edge-list">';
+  pb.edgeCases.forEach(e => {
+    const cls  = e.type==='ok'?'edge-ok':e.type==='warn'?'edge-warn':'edge-danger';
+    const icon = e.type==='ok'?'✅':e.type==='warn'?'⚠️':'🔴';
+    html += `<div class="edge-row ${cls}">${icon}&nbsp;${e.text}</div>`;
+  });
+  html += '</div>';
+
+  // ACTIONS
+  html += `<div class="sop-actions">
+    <button class="reset-btn" onclick="resetSteps()">↺ Reset checklist</button>
+    <span style="font-size:13px;color:#6b7280;margin-left:auto">${doneCount} of ${total} steps completed</span>
+  </div>`;
+
+  document.getElementById('sopBody').innerHTML = html;
+}
+
+function toggleStep(stepId) {
+  const id = currentPB.id;
+  checkedSteps[id][stepId] = !checkedSteps[id][stepId];
+  renderSOP();
+}
+
+function resetSteps() {
+  checkedSteps[currentPB.id] = {};
+  renderSOP();
+}
+
+function goHome() {
+  document.getElementById('sopView').style.display = 'none';
+  document.getElementById('guideView').style.display = 'none';
+  document.getElementById('homeView').style.display = 'flex';
+  document.getElementById('bigSearch').value = '';
+  document.getElementById('searchDrop').style.display = 'none';
+}
+
+function openGuide() {
+  document.getElementById('homeView').style.display = 'none';
+  document.getElementById('guideView').style.display = 'block';
+  buildSummaryTable();
+  window.scrollTo(0,0);
+}
+
+function switchGuide(panel, el) {
+  document.querySelectorAll('.guide-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.guide-panel').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('gpanel-' + panel).classList.add('active');
+  if (panel === 'summary') buildSummaryTable();
+}
+
+const SUMMARY_DATA = [
+  {label:'A new USB external device was recognized by the system', count:9968},
+  {label:'K7 EDR Update Failed', count:1056},
+  {label:'Scan Started', count:93},
+  {label:'Scan Completed', count:85},
+  {label:'Intel hit based on IP', count:314},
+  {label:'Email from first seen sender', count:200},
+  {label:'Creation of multiple files with similar extension — indicative of ransomware', count:141},
+  {label:'Intrusion Blocked', count:94},
+  {label:'Connection to SSH port detected', count:89},
+  {label:'Connection to WinRM port detected', count:69},
+  {label:'Password bruteforce detected', count:49},
+  {label:'Anomalous DNS request by PowerShell', count:34},
+  {label:'Anomalous network request by PowerShell', count:34},
+  {label:'Anomalous Bruteforce', count:32},
+  {label:'Anomalous network connection', count:32},
+  {label:'Potential use of 7-zip to encrypt files', count:24},
+  {label:'First seen tunnel-up action', count:17},
+  {label:'FortiGate alert - NTP.Unknown.Stratum', count:17},
+  {label:'Remote file executed', count:14},
+  {label:'Anomalous execution from roaming folder', count:4},
+  {label:'FortiGate SDWAN Status', count:4},
+  {label:'Successful login after bruteforce', count:4},
+  {label:'Anomalous DNS request', count:7},
+  {label:'Anomalous parent process of PowerShell', count:7},
+  {label:'Anomalous process executed with no company information', count:7},
+  {label:'Anomalous transfer of data via a VPN session', count:7},
+  {label:'Anomalous scheduled task', count:6},
+  {label:'Potential process injection', count:6},
+  {label:'Process created a number of anomalous files with the same extension', count:6},
+  {label:'Process masquerading detected', count:6},
+  {label:'Anomalous user process executed with no company information', count:5},
+  {label:'Threat intel reported', count:4},
+  {label:'Bruteforcing across multiple hosts detected', count:2},
+  {label:'Anomalous data exfiltration via ping protocol', count:2},
+  {label:'OnDemand Scan threat detected', count:2},
+  {label:'Potential SQL server exploit', count:2},
+  {label:'Process tampering detected by Sysmon', count:8},
+  {label:'Anomalous bruteforce', count:32},
+  {label:'Intel hit based on domain', count:1},
+  {label:'Brute force', count:1},
+  {label:'K7 Core Service Crash', count:1},
+].sort((a,b) => b.count - a.count);
+
+let summaryBuilt = false;
+function buildSummaryTable() {
+  if (summaryBuilt) return;
+  summaryBuilt = true;
+  const max = SUMMARY_DATA[0].count;
+  const tbody = document.getElementById('summaryTbody');
+  tbody.innerHTML = SUMMARY_DATA.map(d => {
+    const pct = Math.round(d.count / max * 100);
+    return `<tr>
+      <td>${d.label}</td>
+      <td style="text-align:right;font-weight:600">${d.count.toLocaleString()}</td>
+      <td><div class="bar-wrap"><div class="bar-bg"><div class="bar-fill" style="width:${pct}%"></div></div><span style="font-size:11px;color:#9ca3af;white-space:nowrap">${pct}%</span></div></td>
+    </tr>`;
+  }).join('');
+}
+</script>
+</body>
+</html>
