@@ -350,6 +350,129 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: #f5f6f8
   transition: all 0.15s; margin-top: 1.25rem;
 }
 .guide-btn:hover { border-color: #dc2626; color: #dc2626; background: #fef2f2; }
+
+/* ── ADD NEW SOP BUTTON ── */
+.add-sop-btn {
+  display: flex; align-items: center; gap: 8px;
+  background: #dc2626; color: #fff; border: none; border-radius: 10px;
+  padding: 11px 20px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: background 0.2s; margin-top: 1rem;
+  box-shadow: 0 2px 8px rgba(220,38,38,0.25);
+}
+.add-sop-btn:hover { background: #b91c1c; }
+
+/* ── MODAL OVERLAY ── */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.5); z-index: 200;
+  align-items: flex-start; justify-content: center;
+  overflow-y: auto; padding: 2rem 1rem;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: #fff; border-radius: 16px; width: 100%; max-width: 680px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.2); margin: auto;
+}
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid #e4e7ed;
+}
+.modal-header h2 { font-size: 17px; font-weight: 600; }
+.modal-close {
+  width: 32px; height: 32px; border-radius: 8px; background: #f3f4f6;
+  border: none; cursor: pointer; font-size: 18px; display: flex;
+  align-items: center; justify-content: center; color: #6b7280;
+  font-family: 'Inter', sans-serif; transition: background 0.15s;
+}
+.modal-close:hover { background: #fee2e2; color: #dc2626; }
+.modal-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+.modal-footer {
+  padding: 1rem 1.5rem; border-top: 1px solid #e4e7ed;
+  display: flex; gap: 10px; justify-content: flex-end;
+}
+
+/* form fields */
+.form-group { display: flex; flex-direction: column; gap: 6px; }
+.form-label { font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #374151; }
+.form-label span { color: #dc2626; }
+.form-input, .form-select, .form-textarea {
+  padding: 10px 12px; border: 1px solid #e4e7ed; border-radius: 9px;
+  font-size: 14px; font-family: 'Inter', sans-serif; color: #1a1d23;
+  outline: none; transition: border-color 0.2s;
+  background: #fff;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: #dc2626; box-shadow: 0 0 0 3px rgba(220,38,38,0.06); }
+.form-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* dynamic list (steps, tools, etc.) */
+.dyn-list { display: flex; flex-direction: column; gap: 8px; }
+.dyn-item {
+  display: flex; gap: 8px; align-items: flex-start;
+  background: #f8fafc; border: 1px solid #e4e7ed; border-radius: 9px; padding: 10px 12px;
+}
+.dyn-item input, .dyn-item select {
+  padding: 7px 10px; border: 1px solid #e4e7ed; border-radius: 7px;
+  font-size: 13px; font-family: 'Inter', sans-serif; background: #fff;
+  outline: none; flex: 1; min-width: 0;
+}
+.dyn-item input:focus, .dyn-item select:focus { border-color: #dc2626; }
+.dyn-remove {
+  width: 28px; height: 28px; border-radius: 7px; background: #fee2e2;
+  border: none; cursor: pointer; font-size: 14px; color: #dc2626;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; margin-top: 1px; transition: background 0.15s;
+}
+.dyn-remove:hover { background: #fecaca; }
+.dyn-add {
+  display: flex; align-items: center; gap: 6px;
+  background: #f0fdf4; border: 1px dashed #86efac; border-radius: 8px;
+  padding: 8px 12px; font-size: 13px; font-weight: 500; color: #16a34a;
+  cursor: pointer; transition: background 0.15s; width: 100%;
+  font-family: 'Inter', sans-serif;
+}
+.dyn-add:hover { background: #dcfce7; }
+
+/* submit/cancel buttons */
+.btn-primary {
+  background: #dc2626; color: #fff; border: none; border-radius: 9px;
+  padding: 10px 22px; font-size: 14px; font-weight: 600;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.2s;
+}
+.btn-primary:hover { background: #b91c1c; }
+.btn-secondary {
+  background: #f3f4f6; color: #374151; border: 1px solid #e4e7ed; border-radius: 9px;
+  padding: 10px 18px; font-size: 14px; font-weight: 500;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+}
+.btn-secondary:hover { background: #e5e7eb; }
+
+/* custom SOP badge on card */
+.custom-badge {
+  font-size: 9px; font-weight: 700; background: #fef9c3; color: #854d0e;
+  border: 1px solid #fde68a; border-radius: 99px; padding: 2px 7px;
+  text-transform: uppercase; letter-spacing: 0.4px; margin-left: 4px;
+}
+
+/* delete custom SOP button inside SOP view */
+.delete-sop-btn {
+  display: flex; align-items: center; gap: 5px;
+  background: #fef2f2; border: 1px solid #fecaca; border-radius: 8px;
+  padding: 8px 14px; font-size: 13px; color: #dc2626; font-weight: 500;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: background 0.15s;
+}
+.delete-sop-btn:hover { background: #fee2e2; }
+
+/* section divider for custom SOPs on home */
+.custom-section-label {
+  width: 100%; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.8px; color: #d97706; margin-top: 1rem; margin-bottom: 0.25rem;
+  display: flex; align-items: center; gap: 8px;
+}
+.custom-section-label::after {
+  content: ''; flex: 1; height: 1px; background: #fde68a;
+}
 </style>
 </head>
 <body>
@@ -397,7 +520,98 @@ html, body { height: 100%; font-family: 'Inter', sans-serif; background: #f5f6f8
     <div class="all-cards" id="allCards"></div>
 
     <button class="guide-btn" onclick="openGuide()">📚 SOC Guidelines &amp; Analyst Handbook →</button>
-    <div class="home-footer">K7 Security Operations Center · Internal Use Only · v3.0</div>
+    <button class="add-sop-btn" onclick="openAddModal()">＋ Add New SOP</button>
+    <div class="home-footer">K7 Security Operations Center · Internal Use Only · v4.0</div>
+  </div>
+
+  <!-- ══════════════ ADD NEW SOP MODAL ══════════════ -->
+  <div class="modal-overlay" id="addModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>➕ Add New SOP</h2>
+        <button class="modal-close" onclick="closeAddModal()">✕</button>
+      </div>
+      <div class="modal-body">
+
+        <!-- Basic Info -->
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Alert / SOP Title <span>*</span></label>
+            <input class="form-input" id="f_title" placeholder="e.g. Suspicious PowerShell Execution" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Subtitle / Platform <span>*</span></label>
+            <input class="form-input" id="f_subtitle" placeholder="e.g. L1 Analyst Flow · Cylerian SIEM" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Severity <span>*</span></label>
+            <select class="form-select" id="f_severity">
+              <option value="critical">🔴 Critical</option>
+              <option value="high" selected>🟡 High</option>
+              <option value="medium">🔵 Medium</option>
+              <option value="low">🟢 Low</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Category <span>*</span></label>
+            <select class="form-select" id="f_cat">
+              <option value="network">🌐 Network</option>
+              <option value="endpoint">💻 Endpoint</option>
+              <option value="email">📧 Email</option>
+              <option value="auth">🔑 Auth</option>
+              <option value="malware">🦠 Malware</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label class="form-label">Brief Description / Notes</label>
+          <textarea class="form-textarea" id="f_desc" rows="2" placeholder="What does this alert mean? Any context for new analysts…"></textarea>
+        </div>
+
+        <!-- Steps -->
+        <div class="form-group">
+          <label class="form-label">Investigation Steps <span>*</span></label>
+          <div class="dyn-list" id="steps_list"></div>
+          <button class="dyn-add" onclick="addStep()">＋ Add Step</button>
+        </div>
+
+        <!-- Tools -->
+        <div class="form-group">
+          <label class="form-label">Tools to Use</label>
+          <div class="dyn-list" id="tools_list"></div>
+          <button class="dyn-add" onclick="addTool()">＋ Add Tool</button>
+        </div>
+
+        <!-- Escalation -->
+        <div class="form-group">
+          <label class="form-label">When to Escalate</label>
+          <div class="dyn-list" id="esc_list"></div>
+          <button class="dyn-add" onclick="addEsc()">＋ Add Escalation Trigger</button>
+        </div>
+
+        <!-- Edge Cases -->
+        <div class="form-group">
+          <label class="form-label">Edge Cases / Notes</label>
+          <div class="dyn-list" id="edge_list"></div>
+          <button class="dyn-add" onclick="addEdge()">＋ Add Edge Case</button>
+        </div>
+
+        <!-- Author -->
+        <div class="form-group">
+          <label class="form-label">Created By</label>
+          <input class="form-input" id="f_author" placeholder="Your name or analyst ID" />
+        </div>
+
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" onclick="closeAddModal()">Cancel</button>
+        <button class="btn-primary" onclick="saveNewSOP()">💾 Save SOP</button>
+      </div>
+    </div>
   </div>
 
   <!-- GUIDELINES VIEW -->
@@ -1975,6 +2189,79 @@ let checkedSteps = {};
 let currentPB    = null;
 let activeFilter = 'all';
 
+// ── TOOL HOW-TO GUIDE LINKS ──
+const TOOL_GUIDES = {
+  'VirusTotal':             'https://www.youtube.com/watch?v=DP7VDdVGhbs',
+  'AbuseIPDB':              'https://www.abuseipdb.com/about',
+  'Shodan':                 'https://help.shodan.io/the-basics/what-is-shodan',
+  'WHOIS Lookup':           'https://www.cloudflare.com/en-gb/learning/dns/what-is-whois/',
+  'Whois Lookup':           'https://www.cloudflare.com/en-gb/learning/dns/what-is-whois/',
+  'WhatIsMyIP':             'https://www.whatismyip.com/',
+  'GreyNoise':              'https://docs.greynoise.io/docs/getting-started',
+  'AlienVault OTX':         'https://otx.alienvault.com/faq',
+  'PassiveTotal':           'https://community.riskiq.com/home',
+  'SecurityTrails':         'https://securitytrails.com/blog/securitytrails-101',
+  'ThreatFox':              'https://threatfox.abuse.ch/faq/',
+  'Talos Intelligence':     'https://www.talosintelligence.com/reputation_center',
+  'OpenPhish':              'https://openphish.com/faq.html',
+  'PhishTank':              'https://phishtank.org/faq.php',
+  'Scamalytics':            'https://scamalytics.com/ip/help',
+  'IPInfo / IPAPI':         'https://ipinfo.io/faq',
+  'MetaDefender':           'https://docs.opswat.com/mdcloud/getting-started/how-to-scan-a-file',
+  'Spur.us':                'https://spur.us/docs/',
+  'ANY.RUN':                'https://any.run/cybersecurity-blog/how-to-use-anyrun/',
+  'Hybrid Analysis':        'https://www.hybrid-analysis.com/blog/how-to-use-hybrid-analysis',
+  'Joe Sandbox':            'https://www.joesecurity.org/joe-sandbox-documentation',
+  'URLScan.io':             'https://urlscan.io/about/',
+  'UrlScan.io':             'https://urlscan.io/about/',
+  'MXToolbox':              'https://mxtoolbox.com/problem/email/',
+  'DNSDumpster':            'https://dnsdumpster.com/',
+  'PEStudio':               'https://www.winitor.com/tools/pestudio/documentation/',
+  'Detect It Easy (DIE)':   'https://github.com/horsicq/Detect-It-Easy/blob/master/README.md',
+  'TrIDNet':                'https://mark0.net/soft-trid-e.html',
+  'ExifTool':               'https://exiftool.org/index.html#how',
+  'strings':                'https://learn.microsoft.com/en-us/sysinternals/downloads/strings',
+  'Wireshark':              'https://www.wireshark.org/docs/wsug_html_chunked/ChapterIntroduction.html',
+  'nslookup / dig':         'https://www.cloudflare.com/en-gb/learning/dns/dns-records/dns-nslookup/',
+  'Windows Event Logs':     'https://learn.microsoft.com/en-us/windows/win32/eventlog/event-logging',
+  'Sysmon Logs':            'https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon',
+  'FortiGate / VPN GW':     'https://docs.fortinet.com/product/fortigate/7.4',
+  'AD / IAM':               'https://learn.microsoft.com/en-us/windows-server/identity/ad-ds/get-started/virtual-dc/active-directory-domain-services-overview',
+  'Firewall Logs':          'https://www.cloudflare.com/en-gb/learning/security/what-is-a-firewall/',
+  'DNS Logs':               'https://www.cloudflare.com/en-gb/learning/dns/what-is-dns/',
+  'Proxy Logs':             'https://www.cloudflare.com/en-gb/learning/access-management/what-is-a-proxy-server/',
+  'Mail Logs / Headers':    'https://mxtoolbox.com/EmailHeaders.aspx',
+  '7-Zip Logs':             'https://www.7-zip.org/faq.html',
+  'K7 XDR':                 'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 XDR (InfiniShield)':  'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 XDR InfiniShield':    'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7InfiniShield':         'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7InfiniShield XDR':     'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7InfiniShield SIEM':    'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7InfiniShield XDR/EDR': 'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 InfiniShield XDR':    'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 Infinishield':        'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 Infinishield SIEM':   'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 Infinishield XDR':    'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 EDR':                 'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 EDR (NGAGE)':         'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'K7 Endpoint Security':   'https://www.k7computing.com/enterprise/k7-endpoint-security',
+  'Cylerian SIEM':          'https://cylerian.com/',
+  'Cyllerian SIEM':         'https://cylerian.com/',
+  'K7 Cylerian SIEM':       'https://cylerian.com/',
+};
+
+function getToolGuideLink(toolName) {
+  if (TOOL_GUIDES[toolName] !== undefined) return TOOL_GUIDES[toolName];
+  for (const key of Object.keys(TOOL_GUIDES)) {
+    if (toolName.toLowerCase().includes(key.toLowerCase()) ||
+        key.toLowerCase().includes(toolName.toLowerCase())) {
+      return TOOL_GUIDES[key];
+    }
+  }
+  return null;
+}
+
 // ── LOGIN ──
 function login() {
   if (document.getElementById('lp').value === PW) {
@@ -1989,17 +2276,8 @@ function login() {
 
 // ── HOME ──
 function buildHome() {
-  const grid = document.getElementById('allCards');
-  grid.innerHTML = PLAYBOOKS.map(pb => `
-    <div class="alert-card" data-cat="${pb.cat}" onclick="openSOP('${pb.id}')">
-      <div class="ac-icon ${ICON_CLASS[pb.severity]}">${ICONS[pb.id]||'📋'}</div>
-      <div>
-        <div class="ac-name">${pb.title}</div>
-        <div class="ac-steps">${pb.steps.length} steps · ${pb.subtitle}</div>
-      </div>
-      <span class="ac-sev ${SEV_CLASS[pb.severity]}">${pb.severity.toUpperCase()}</span>
-    </div>
-  `).join('');
+  loadCustomSOPsIntoRuntime();
+  refreshHomeCards();
 
   // Search
   const inp  = document.getElementById('bigSearch');
@@ -2016,9 +2294,9 @@ function buildHome() {
     if (!hits.length) { drop.style.display='none'; return; }
     drop.innerHTML = hits.map(pb => `
       <div class="srd-item" onclick="openSOP('${pb.id}')">
-        <div class="srd-icon ${ICON_CLASS[pb.severity]}">${ICONS[pb.id]||'📋'}</div>
+        <div class="srd-icon ${ICON_CLASS[pb.severity]||'icon-high'}">${ICONS[pb.id]||'📋'}</div>
         <div>
-          <div class="srd-name">${pb.title}</div>
+          <div class="srd-name">${pb.title}${pb.custom?'<span class="custom-badge" style="margin-left:6px">Custom</span>':''}</div>
           <div class="srd-steps">${pb.steps.length} steps · ${pb.subtitle}</div>
         </div>
         <span class="srd-sev ${SEV_CLASS[pb.severity]}">${pb.severity.toUpperCase()}</span>
@@ -2107,7 +2385,13 @@ function renderSOP() {
         <div class="step-num-label">Step ${i+1} · <span class="step-type-badge badge-${s.type}">${badgeLabel}</span></div>
         <div class="step-action">${s.action}</div>
         <div class="step-meta">
-          <span class="meta-chip chip-tool">🔧 ${s.tool}</span>
+          ${s.tool.split(/[,/]/).map(t => {
+            const tn = t.trim();
+            const link = getToolGuideLink(tn);
+            return link
+              ? `<span class="meta-chip chip-tool">🔧 ${tn} <a href="${link}" target="_blank" rel="noopener" style="font-size:11px;font-weight:600;color:#2563eb;text-decoration:none;margin-left:4px;white-space:nowrap" title="How to use ${tn}">How to use →</a></span>`
+              : `<span class="meta-chip chip-tool">🔧 ${tn}</span>`;
+          }).join('')}
           <span class="meta-chip ${outcomeChip}">→ ${s.outcome}</span>
         </div>
       </div>
@@ -2130,10 +2414,20 @@ function renderSOP() {
   html += '<div class="sec-label" style="margin-top:2rem">🛠 Tools Reference</div>';
   html += '<div class="tools-grid">';
   pb.tools.forEach(t => {
+    const link = getToolGuideLink(t.name);
     html += `<div class="tool-tile">
       <div class="tool-cat">${t.cat}</div>
       <div class="tool-name">${t.name}</div>
       <div class="tool-desc">${t.desc}</div>
+      ${link
+        ? `<a href="${link}" target="_blank" rel="noopener"
+            style="display:inline-flex;align-items:center;gap:4px;margin-top:8px;font-size:11px;font-weight:600;color:#2563eb;text-decoration:none;background:#eff6ff;padding:3px 9px;border-radius:6px;border:1px solid #bfdbfe;transition:background 0.15s"
+            onmouseover="this.style.background='#dbeafe'" onmouseout="this.style.background='#eff6ff'"
+            title="Learn how to use ${t.name}">
+            📖 How to use →
+          </a>`
+        : `<span style="display:inline-block;margin-top:8px;font-size:11px;color:#9ca3af;font-style:italic">Internal platform</span>`
+      }
     </div>`;
   });
   html += '</div>';
@@ -2163,7 +2457,17 @@ function renderSOP() {
   html += `<div class="sop-actions">
     <button class="reset-btn" onclick="resetSteps()">↺ Reset checklist</button>
     <span style="font-size:13px;color:#6b7280;margin-left:auto">${doneCount} of ${total} steps completed</span>
+    ${pb.custom ? `<button class="delete-sop-btn" onclick="deleteCustomSOP('${pb.id}')">🗑 Delete SOP</button>` : ''}
   </div>`;
+
+  // Custom SOP meta info
+  if (pb.custom) {
+    html += `<div style="margin-top:1rem;padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:12px;color:#92400e;display:flex;gap:16px;flex-wrap:wrap">
+      <span>✍️ <strong>Created by:</strong> ${pb.author || 'SOC Analyst'}</span>
+      <span>📅 <strong>Date:</strong> ${pb.createdAt || '—'}</span>
+      <span>💾 <strong>Storage:</strong> Browser (local)</span>
+    </div>`;
+  }
 
   document.getElementById('sopBody').innerHTML = html;
 }
@@ -2261,6 +2565,236 @@ function buildSummaryTable() {
     </tr>`;
   }).join('');
 }
+
+// ══════════════════════════════════════════
+// ADD NEW SOP — BROWSER STORAGE FEATURE
+// ══════════════════════════════════════════
+
+const CUSTOM_KEY = 'k7_custom_sops_v1';
+
+function loadCustomSOPs() {
+  try { return JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]'); }
+  catch(e) { return []; }
+}
+function saveCustomSOPs(arr) {
+  localStorage.setItem(CUSTOM_KEY, JSON.stringify(arr));
+}
+
+// ── OPEN / CLOSE MODAL ──
+function openAddModal() {
+  document.getElementById('addModal').classList.add('open');
+  ['steps_list','tools_list','esc_list','edge_list'].forEach(id => {
+    document.getElementById(id).innerHTML = '';
+  });
+  ['f_title','f_subtitle','f_desc','f_author'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  addStep(); addStep(); addStep();
+  addTool();
+  addEsc();
+  addEdge();
+}
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+// ── DYNAMIC ROW BUILDERS ──
+function addStep() {
+  const list = document.getElementById('steps_list');
+  const idx  = list.children.length + 1;
+  const div  = document.createElement('div');
+  div.className = 'dyn-item';
+  div.innerHTML = `
+    <div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0">
+      <input placeholder="Step ${idx}: What to do — e.g. Check firewall action in SIEM" class="step-action-inp" />
+      <div style="display:flex;gap:6px;flex-wrap:wrap">
+        <input placeholder="Tool — e.g. Cylerian SIEM" style="flex:1;min-width:100px" class="step-tool-inp" />
+        <input placeholder="Expected outcome" style="flex:1;min-width:100px" class="step-out-inp" />
+        <select class="step-type-sel" style="width:105px;padding:7px 8px;border:1px solid #e4e7ed;border-radius:7px;font-size:12px;font-family:Inter,sans-serif;background:#fff;outline:none">
+          <option value="action">Action</option>
+          <option value="decision">Decision</option>
+          <option value="escalate">Escalate</option>
+          <option value="close">Close</option>
+        </select>
+      </div>
+    </div>
+    <button class="dyn-remove" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(div);
+}
+
+function addTool() {
+  const list = document.getElementById('tools_list');
+  const div  = document.createElement('div');
+  div.className = 'dyn-item';
+  div.innerHTML = `
+    <input placeholder="Category — e.g. OSINT" style="width:100px;flex:none" class="tool-cat-inp" />
+    <input placeholder="Tool name — e.g. VirusTotal" class="tool-name-inp" />
+    <input placeholder="What it's used for" class="tool-desc-inp" />
+    <button class="dyn-remove" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(div);
+}
+
+function addEsc() {
+  const list = document.getElementById('esc_list');
+  const div  = document.createElement('div');
+  div.className = 'dyn-item';
+  div.innerHTML = `
+    <input placeholder="Trigger — e.g. Malicious IP confirmed" style="flex:2" class="esc-trig-inp" />
+    <input placeholder="Action — e.g. Escalate to Jithu" style="flex:2" class="esc-act-inp" />
+    <button class="dyn-remove" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(div);
+}
+
+function addEdge() {
+  const list = document.getElementById('edge_list');
+  const div  = document.createElement('div');
+  div.className = 'dyn-item';
+  div.innerHTML = `
+    <select class="edge-type-sel" style="width:95px;flex:none;padding:7px 8px;border:1px solid #e4e7ed;border-radius:7px;font-size:12px;font-family:Inter,sans-serif;background:#fff;outline:none">
+      <option value="ok">✅ OK</option>
+      <option value="warn">⚠️ Warn</option>
+      <option value="danger">🔴 Danger</option>
+    </select>
+    <input placeholder="Note — e.g. 0 bytes transferred → Close as Benign." class="edge-text-inp" />
+    <button class="dyn-remove" onclick="this.parentElement.remove()">✕</button>`;
+  list.appendChild(div);
+}
+
+// ── SAVE ──
+function saveNewSOP() {
+  const title    = document.getElementById('f_title').value.trim();
+  const subtitle = document.getElementById('f_subtitle').value.trim();
+  const severity = document.getElementById('f_severity').value;
+  const cat      = document.getElementById('f_cat').value;
+  const desc     = document.getElementById('f_desc').value.trim();
+  const author   = document.getElementById('f_author').value.trim();
+
+  if (!title) { showToast('⚠️ Please enter a title for the SOP.'); return; }
+
+  const steps = [];
+  document.querySelectorAll('#steps_list .dyn-item').forEach((row, i) => {
+    const action = row.querySelector('.step-action-inp').value.trim();
+    if (!action) return;
+    steps.push({
+      id: 'cs' + (i+1),
+      action,
+      tool:    row.querySelector('.step-tool-inp').value.trim() || '—',
+      outcome: row.querySelector('.step-out-inp').value.trim()  || '—',
+      type:    row.querySelector('.step-type-sel').value
+    });
+  });
+  if (!steps.length) { showToast('⚠️ Please add at least one step.'); return; }
+
+  const tools = [];
+  document.querySelectorAll('#tools_list .dyn-item').forEach(row => {
+    const name = row.querySelector('.tool-name-inp').value.trim();
+    if (!name) return;
+    tools.push({ cat: row.querySelector('.tool-cat-inp').value.trim()||'Tool', name, desc: row.querySelector('.tool-desc-inp').value.trim()||'' });
+  });
+
+  const escalation = [];
+  document.querySelectorAll('#esc_list .dyn-item').forEach(row => {
+    const trigger = row.querySelector('.esc-trig-inp').value.trim();
+    if (!trigger) return;
+    escalation.push({ trigger, action: row.querySelector('.esc-act-inp').value.trim()||'—' });
+  });
+
+  const edgeCases = [];
+  document.querySelectorAll('#edge_list .dyn-item').forEach(row => {
+    const text = row.querySelector('.edge-text-inp').value.trim();
+    if (!text) return;
+    edgeCases.push({ type: row.querySelector('.edge-type-sel').value, text });
+  });
+
+  const id = 'custom_' + Date.now();
+  const newSOP = {
+    id, title,
+    subtitle: subtitle || 'Custom SOP · Added by Agent',
+    severity, cat,
+    custom: true,
+    author: author || 'SOC Analyst',
+    createdAt: new Date().toLocaleDateString('en-GB'),
+    tags: [cat, severity, 'Custom SOP', author||'SOC Analyst'],
+    dataPoints: desc ? [{ field:'Overview', extract:'', why: desc }] : [],
+    steps, tools,
+    escalation: escalation.length ? escalation : [],
+    edgeCases:  edgeCases.length  ? edgeCases  : [],
+    quickDecision: []
+  };
+
+  const existing = loadCustomSOPs();
+  existing.push(newSOP);
+  saveCustomSOPs(existing);
+  PLAYBOOKS.push(newSOP);
+
+  closeAddModal();
+  refreshHomeCards();
+  showToast('✅ SOP "' + title + '" saved!');
+}
+
+// ── REFRESH HOME CARDS ──
+function refreshHomeCards() {
+  const builtIn = PLAYBOOKS.filter(p => !p.custom);
+  const custom  = PLAYBOOKS.filter(p => p.custom);
+  let html = builtIn.map(pb => cardHTML(pb)).join('');
+  if (custom.length) {
+    html += `<div class="custom-section-label" style="grid-column:1/-1">⭐ Agent-Added SOPs (${custom.length})</div>`;
+    html += custom.map(pb => cardHTML(pb)).join('');
+  }
+  document.getElementById('allCards').innerHTML = html;
+  const activeEl = document.querySelector('.filter-tab.active');
+  const cat = activeEl ? activeEl.dataset.cat : 'all';
+  document.querySelectorAll('.alert-card').forEach(card => {
+    if (cat === 'all' || card.dataset.cat === cat) card.classList.remove('hidden');
+    else card.classList.add('hidden');
+  });
+}
+
+function cardHTML(pb) {
+  const customBadge = pb.custom ? '<span class="custom-badge">Custom</span>' : '';
+  return `<div class="alert-card" data-cat="${pb.cat}" onclick="openSOP('${pb.id}')">
+    <div class="ac-icon ${ICON_CLASS[pb.severity]||'icon-high'}">${ICONS[pb.id]||'📋'}</div>
+    <div style="min-width:0;flex:1">
+      <div class="ac-name">${pb.title}${customBadge}</div>
+      <div class="ac-steps">${pb.steps.length} steps · ${pb.subtitle}</div>
+    </div>
+    <span class="ac-sev ${SEV_CLASS[pb.severity]}">${pb.severity.toUpperCase()}</span>
+  </div>`;
+}
+
+// ── DELETE CUSTOM SOP ──
+function deleteCustomSOP(id) {
+  if (!confirm('Delete this custom SOP? This cannot be undone.')) return;
+  const existing = loadCustomSOPs().filter(s => s.id !== id);
+  saveCustomSOPs(existing);
+  const idx = PLAYBOOKS.findIndex(p => p.id === id);
+  if (idx > -1) PLAYBOOKS.splice(idx, 1);
+  goHome();
+  showToast('🗑 SOP deleted.');
+}
+
+// ── TOAST ──
+function showToast(msg) {
+  let t = document.getElementById('k7toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'k7toast';
+    t.style.cssText = 'position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1d23;color:#fff;padding:12px 22px;border-radius:10px;font-size:14px;font-weight:500;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.25);transition:opacity 0.4s;font-family:Inter,sans-serif;pointer-events:none';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.style.opacity = '0'; }, 3000);
+}
+
+// ── LOAD CUSTOM SOPs ON STARTUP ──
+function loadCustomSOPsIntoRuntime() {
+  loadCustomSOPs().forEach(sop => {
+    if (!PLAYBOOKS.find(p => p.id === sop.id)) PLAYBOOKS.push(sop);
+  });
+}
+
 </script>
 </body>
 </html>
